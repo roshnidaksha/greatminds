@@ -6,42 +6,101 @@ import initialEvents from '../data/events.json';
 import activityImages from '../data/images.json';
 import './StaffCalendar.css';
 
+const DAYS = [
+    { label: 'Mon', value: 1 },
+    { label: 'Tue', value: 2 },
+    { label: 'Wed', value: 3 },
+    { label: 'Thu', value: 4 },
+    { label: 'Fri', value: 5 },
+    { label: 'Sat', value: 6 },
+    { label: 'Sun', value: 0 },
+];
+
 const StaffCalendar = () => {
     const [events, setEvents] = useState(initialEvents);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [formData, setFormData] = useState({
         title: '',
-        date: '',
+        startDate: '',
         startTime: '09:00',
         endTime: '10:00',
         isWheelchairAccessible: false,
-        selectedImage: activityImages[0].url
+        selectedImage: activityImages[0].url,
+        selectedDays: [],
+        commitment: 1
     });
 
     const handleDateClick = (arg) => {
-        setFormData({ ...formData, date: arg.dateStr });
+        const dayValue = new Date(arg.dateStr).getDay();
+        setFormData({ ...formData, startDate: arg.dateStr, selectedDays: [dayValue] });
         setIsModalOpen(true);
     };
 
+    const toggleDay = (dayValue) => {
+        const current = formData.selectedDays;
+        const newDays = current.includes(dayValue)
+            ? current.filter(d => d !== dayValue)
+            : [...current, dayValue];
+        setFormData({ ...formData, selectedDays: newDays });
+    }
+
     const handleSave = () => {
-        const startDateTime = `${formData.date}T${formData.startTime}:00`;
-        const endDateTime = `${formData.date}T${formData.endTime}:00`;
+        const isMultiDay = formData.selectedDays.length > 1;
+        const seriesId = isMultiDay ? `series_${Date.now()}` : null;
+        const newEventsBatch = [];
 
-        const newEvent = {
-            id: String(Date.now()),
-            title: formData.title,
-            start: startDateTime,
-            end: endDateTime,
-            extendedProps: {
-                isWheelchairAccessible: formData.isWheelchairAccessible,
-                imageUrl: formData.selectedImage
-            }
-        };
+        if (!isMultiDay) {
+            newEventsBatch.push({
+                id: `event_${Math.random().toString(36)}`,
+                isSeries: false,
+                seriesId: null,
+                title: formData.title,
+                start: `${formData.startDate}T${formData.startTime}:00`,
+                end: `${formData.startDate}T${formData.endTime}:00`,
+                extendedProps: {
+                    isWheelchairAccessible: formData.isWheelchairAccessible,
+                    imageUrl: formData.selectedImage,
+                    minCommitment: 1
+                }
+            });
+        } else {
+            formData.selectedDays.forEach(dayOffset => {
+                const baseDate = new Date(formData.startDate);
+                const dayOfWeek = baseDate.getDay();
+                const distance = (dayOffset + 7 - dayOfWeek) % 7;
+                const eventDate = new Date(baseDate);
+                eventDate.setDate(baseDate.getDate() + distance);
+                const dateStr = eventDate.toISOString().split('T')[0];
 
-        setEvents([...events, newEvent]);
+                newEventsBatch.push({
+                    id: `event_${Math.random().toString(36)}`,
+                    isSeries: true,
+                    seriesId: seriesId,
+                    title: formData.title,
+                    start: `${dateStr}T${formData.startTime}:00`,
+                    end: `${dateStr}T${formData.endTime}:00`,
+                    extendedProps: {
+                        isWheelchairAccessible: formData.isWheelchairAccessible,
+                        imageUrl: formData.selectedImage,
+                        minCommitment: formData.commitment
+                    }
+                });
+            });
+        }
+
+        setEvents([...events, ...newEventsBatch]);
         setIsModalOpen(false);
-        setFormData({ title: '', date: '', startTime: '09:00', endTime: '10:00', isWheelchairAccessible: false });
+        setFormData({
+            title: '',
+            startDate: '',
+            startTime: '09:00',
+            endTime: '10:00',
+            isWheelchairAccessible: false,
+            selectedImage: activityImages[0].url,
+            selectedDays: [],
+            commitment: 1
+        });
     };
 
     const renderEventContent = (eventInfo) => {
@@ -71,7 +130,7 @@ const StaffCalendar = () => {
             {isModalOpen && (
                 <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <h3>New Activity for {formData.date}</h3>
+                        <h3>New Activity for {formData.startDate}</h3>
 
                         <label>Select Activity Icon</label>
                         <div className="image-grid">
@@ -90,6 +149,34 @@ const StaffCalendar = () => {
                         <label>Program Title</label>
                         <input type="text" value={formData.title}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
+
+                        <label>Repeat on:</label>
+                        <div className="weekday-chips">
+                            {DAYS.map(day => (
+                                <button
+                                    key={day.value}
+                                    className={formData.selectedDays.includes(day.value) ? 'active' : ''}
+                                    onClick={() => toggleDay(day.value)}
+                                >
+                                    {day.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        {formData.selectedDays.length > 1 && (
+                            <>
+                                <label>Commitment Requirement:</label>
+                                <div className="commitment-input">
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max={formData.selectedDays.length}
+                                        value={formData.commitment}
+                                        onChange={(e) => setFormData({ ...formData, commitment: parseInt(e.target.value) })}
+                                    />
+                                </div>
+                            </>
+                        )}
 
                         <div className="time-row">
                             <div>
