@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -19,6 +20,7 @@ const DAYS = [
 ];
 
 const StaffCalendar = () => {
+    const navigate = useNavigate();
     const [events, setEvents] = useState(initialEvents);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -41,6 +43,26 @@ const StaffCalendar = () => {
         const dayValue = new Date(arg.dateStr).getDay();
         setFormData({ ...formData, startDate: arg.dateStr, selectedDays: [dayValue] });
         setIsModalOpen(true);
+    };
+
+    const handleEventClick = (clickInfo) => {
+        console.log('Event clicked!', clickInfo.event.title); // Debug log
+        
+        // Get the event data
+        const eventData = {
+            id: clickInfo.event.id,
+            title: clickInfo.event.title,
+            start: clickInfo.event.startStr,
+            end: clickInfo.event.endStr,
+            extendedProps: clickInfo.event.extendedProps
+        };
+        
+        console.log('Navigating with event:', eventData); // Debug log
+        
+        // Navigate to event details page
+        navigate('/event-details', {
+            state: { event: eventData }
+        });
     };
 
     const toggleDay = (dayValue) => {
@@ -142,8 +164,10 @@ const StaffCalendar = () => {
                 initialView="dayGridMonth"
                 events={events}
                 dateClick={handleDateClick}
+                eventClick={handleEventClick}
                 eventContent={renderEventContent}
                 height="80vh"
+                eventDisplay="block"
             />
 
             {isModalOpen && (

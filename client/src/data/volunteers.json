@@ -1,0 +1,74 @@
+[
+    {
+        "id": 1,
+        "eventId": 1,
+        "name": "Alice Wong",
+        "email": "alice.wong@email.com",
+        "phone": "+65 8123 4567",
+        "status": "registered",
+        "attendance": null
+    },
+    {
+        "id": 2,
+        "eventId": 1,
+        "name": "David Tan",
+        "email": "david.tan@email.com",
+        "phone": "+65 8234 5678",
+        "status": "registered",
+        "attendance": null
+    },
+    {
+        "id": 3,
+        "eventId": "event_101",
+        "name": "Sarah Lim",
+        "email": "sarah.lim@email.com",
+        "phone": "+65 8345 6789",
+        "status": "registered",
+        "attendance": null
+    },
+    {
+        "id": 4,
+        "eventId": "event_101",
+        "name": "James Ng",
+        "email": "james.ng@email.com",
+        "phone": "+65 8456 7890",
+        "status": "registered",
+        "attendance": null
+    },
+    {
+        "id": 5,
+        "eventId": "event_102",
+        "name": "Peter Koh",
+        "email": "peter.koh@email.com",
+        "phone": "+65 8567 8901",
+        "status": "registered",
+        "attendance": null
+    },
+    {
+        "id": 6,
+        "eventId": "event_102",
+        "name": "Linda Goh",
+        "email": "linda.goh@email.com",
+        "phone": "+65 8678 9012",
+        "status": "registered",
+        "attendance": null
+    },
+    {
+        "id": 7,
+        "eventId": "event_103",
+        "name": "Michael Yeo",
+        "email": "michael.yeo@email.com",
+        "phone": "+65 8789 0123",
+        "status": "registered",
+        "attendance": null
+    },
+    {
+        "id": 8,
+        "eventId": "event_103",
+        "name": "Rachel Chua",
+        "email": "rachel.chua@email.com",
+        "phone": "+65 8890 1234",
+        "status": "registered",
+        "attendance": null
+    }
+]

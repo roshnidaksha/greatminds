@@ -6,6 +6,34 @@ export default function Dashboard() {
     const navigate = useNavigate();
     const role = localStorage.getItem("role");
 
+    const renderDashboardContent = () => {
+        switch(role) {
+            case "Staff":
+                return <StaffCalendar />;
+            
+            case "Volunteer":
+                return (
+                    <div style={{ 
+                        background: "white", 
+                        padding: "40px", 
+                        borderRadius: "16px",
+                        textAlign: "center",
+                        marginTop: "20px",
+                        boxShadow: "0 6px 20px rgba(0,0,0,0.08)"
+                    }}>
+                        <h2>Volunteer Dashboard</h2>
+                        <p style={{ color: "#666" }}>Volunteer view coming soon...</p>
+                    </div>
+                );
+            
+            case "Participant":
+                return <ParticipantCalendar />
+            
+            default:
+                return <p>Invalid role</p>;
+        }
+    };
+
     return (
         <div style={{ padding: "120px 32px 32px 32px" }}>
             <div
@@ -41,10 +69,8 @@ export default function Dashboard() {
                     Log out
                 </button>
             </div>
-
-            <ParticipantCalendar />
-
-            <StaffCalendar />
+            
+            {renderDashboardContent()}
         </div>
     );
 }

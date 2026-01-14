@@ -125,11 +125,12 @@
     accent-color: #0b3c91;
 }
 
-/* Image selection grid */
+/* ========== Image picker =========== */
 .image-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 10px;
+    margin-bottom: 20px;
 }
 
 .image-tile {
@@ -161,7 +162,11 @@
     font-weight: 600;
 }
 
-/* Weekday chips */
+.image-tile:hover {
+    background-color: #f0f0f0;
+}
+
+/* ========== Day selector ========== */
 .weekday-chips {
     margin-top: 0px;
     display: flex;

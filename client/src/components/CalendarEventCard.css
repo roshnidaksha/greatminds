@@ -1,53 +1,69 @@
 /* Shared event card styles for FullCalendar dayGrid cells */
+.fc .fc-daygrid-event {
+    padding: 0 !important;
+    cursor: pointer;
+}
+
+.fc .fc-daygrid-event .fc-event-main {
+    background: transparent !important;
+    border: none !important;
+}
 .fc .event-card {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 8px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: saturate(110%);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
-  max-width: 100%;
-  line-height: 1.1;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 4px 6px;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1px solid #e7eef5;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    max-width: 100%;
+    margin: 0 auto;
+    line-height: 1.1;
+    transition: box-shadow 120ms ease, transform 120ms ease;
 }
 
 .fc .event-thumb {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  object-fit: cover;
-  flex: 0 0 34px;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex: 0 0 40px;
 }
 
 .fc .event-bottom {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  max-width: 100%;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
 }
 
 .fc .event-title {
-  font-size: 12px;
-  color: #0b3c91;
-  font-weight: 700;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+    font-size: 12px;
+    color: #0b3c91;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .fc .badge {
-  font-size: 12px;
-  line-height: 1;
-  padding: 2px 6px;
-  border-radius: 10px;
-  background: #eef8ff;
-  color: #0b3c91;
-  margin-left: 4px;
+    font-size: 12px;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 10px;
+    background: #f3f4f6;
+    color: #0b3c91;
+    margin-left: 4px;
 }
 
 .fc .badge-access {
-  background: #e9fbf7;
-  color: #0b7a5a;
+    background: #e9fbf7;
+    color: #0b7a5a;
+}
+
+.fc .event-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
 }

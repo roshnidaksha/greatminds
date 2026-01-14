@@ -11,3 +11,11 @@
     color: #0b3c91;
     text-decoration: none;
 }
+
+.fc-event .fc-event-main {
+    background: none !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0 !important;
+}
