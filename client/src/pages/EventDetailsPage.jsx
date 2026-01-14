@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import activityImages from "../data/images.json";
+import participantsData from "../data/participants.json";
+import volunteersData from "../data/volunteers.json";
 
 export default function EventDetailsPage() {
     const navigate = useNavigate();
@@ -17,56 +19,76 @@ export default function EventDetailsPage() {
         cost: event?.extendedProps?.cost || ""
     });
 
-    // Mock participant data
-    const [participants, setParticipants] = useState([
-        {
-            id: 1,
-            name: "John Doe",
-            caregiverName: "Jane Doe",
-            email: "john.doe@email.com",
-            phone: "+65 9123 4567",
-            status: "registered",
-            attendance: null
-        },
-        {
-            id: 2,
-            name: "Mary Smith",
-            caregiverName: "Tom Smith",
-            email: "mary.smith@email.com",
-            phone: "+65 9234 5678",
-            status: "registered",
-            attendance: null
-        },
-        {
-            id: 3,
-            name: "Robert Lee",
-            caregiverName: "Sarah Lee",
-            email: "robert.lee@email.com",
-            phone: "+65 9345 6789",
-            status: "registered",
-            attendance: null
-        }
-    ]);
+    // Load participants and volunteers for this event
+    const [participants, setParticipants] = useState([]);
+    const [volunteers, setVolunteers] = useState([]);
 
-    // Mock volunteer data
-    const [volunteers, setVolunteers] = useState([
-        {
-            id: 1,
-            name: "Alice Wong",
-            email: "alice.wong@email.com",
-            phone: "+65 8123 4567",
-            status: "registered",
-            attendance: null
-        },
-        {
-            id: 2,
-            name: "David Tan",
-            email: "david.tan@email.com",
-            phone: "+65 8234 5678",
-            status: "registered",
-            attendance: null
+    useEffect(() => {
+    
+        if (event?.id) {
+            // Filter participants and volunteers for this specific event
+            const eventParticipants = participantsData.filter(p => p.eventId == event.id);
+            const eventVolunteers = volunteersData.filter(v => v.eventId == event.id);
+            
+            // If no specific data found, show default participants/volunteers
+            if (eventParticipants.length === 0) {
+                setParticipants([
+                    {
+                        id: 1,
+                        name: "John Doe",
+                        caregiverName: "Jane Doe",
+                        email: "john.doe@email.com",
+                        phone: "+65 9123 4567",
+                        status: "registered",
+                        attendance: null
+                    },
+                    {
+                        id: 2,
+                        name: "Mary Smith",
+                        caregiverName: "Tom Smith",
+                        email: "mary.smith@email.com",
+                        phone: "+65 9234 5678",
+                        status: "registered",
+                        attendance: null
+                    },
+                    {
+                        id: 3,
+                        name: "Robert Lee",
+                        caregiverName: "Sarah Lee",
+                        email: "robert.lee@email.com",
+                        phone: "+65 9345 6789",
+                        status: "registered",
+                        attendance: null
+                    }
+                ]);
+            } else {
+                setParticipants(eventParticipants);
+            }
+            
+            if (eventVolunteers.length === 0) {
+                setVolunteers([
+                    {
+                        id: 1,
+                        name: "Alice Wong",
+                        email: "alice.wong@email.com",
+                        phone: "+65 8123 4567",
+                        status: "registered",
+                        attendance: null
+                    },
+                    {
+                        id: 2,
+                        name: "David Tan",
+                        email: "david.tan@email.com",
+                        phone: "+65 8234 5678",
+                        status: "registered",
+                        attendance: null
+                    }
+                ]);
+            } else {
+                setVolunteers(eventVolunteers);
+            }
         }
-    ]);
+    }, [event?.id]);
 
     const [confirmationMessage, setConfirmationMessage] = useState("");
     const [attendanceMessage, setAttendanceMessage] = useState("");
