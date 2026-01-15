@@ -10,17 +10,17 @@
             "imageUrl": "https://placehold.co/100x100?text=Art",
             "isWheelchairAccessible": true,
             "minDaysRequired": 1,
-            "contactIC": "12345678",
+            "contactICName": "Sarah Johnson",
+            "contactICPhone": "+65 9876 5432",
+            "meetingPoint": "Woodlands MRT Exit 1 at 9:45am",
             "cost": 5,
             "location": "Community Center Room 1",
             "description": "A workshop to practice mindfulness and meditation techniques.",
             "volunteerInfo": {
                 "tasksDescription": "Help set up meditation mats, assist participants with seating, serve refreshments during break",
                 "staffPresent": ["Sarah Johnson", "Michael Lee", "Grace Tan"],
-                "contactICName": "Sarah Johnson",
-                "contactICPhone": "+65 9876 5432",
-                "meetingPoint": "Woodlands MRT Exit 1 at 9:45am",
-                "isVolunteerFull": true
+                "nVolunteersRequired":6,
+                "nVolunteersRegistered":6
             }
         }
     },
@@ -35,17 +35,17 @@
             "imageUrl": "https://placehold.co/100x100?text=Ser",
             "isWheelchairAccessible": true,
             "minDaysRequired": 3,
-            "contactIC": "12345678",
+            "contactICName": "Jennifer Wong",
+            "contactICPhone": "+65 9123 8765",
+            "meetingPoint": "Yishun MRT Exit 2 at 11:30am",
             "cost": 5,
             "location": "Community Center Room 2",
             "description": "A weekly program focusing on physical activities and social engagement for seniors.",
             "volunteerInfo": {
                 "tasksDescription": "Assist with exercise equipment setup, guide seniors through light exercises, facilitate group activities",
                 "staffPresent": ["Jennifer Wong", "David Chen", "Rachel Ng"],
-                "contactICName": "Jennifer Wong",
-                "contactICPhone": "+65 9123 8765",
-                "meetingPoint": "Yishun MRT Exit 2 at 11:30am",
-                "isVolunteerFull": false
+                "nVolunteersRequired":3,
+                "nVolunteersRegistered":1
             }
         }
     },
@@ -60,17 +60,17 @@
             "imageUrl": "https://placehold.co/100x100?text=Ser",
             "isWheelchairAccessible": true,
             "minDaysRequired": 3,
-            "contactIC": "12345678",
+            "contactICName": "Jennifer Wong",
+            "contactICPhone": "+65 9123 8765",
+            "meetingPoint": "Yishun MRT Exit 2 at 11:30am",
             "cost": 5,
             "location": "Community Center Room 2",
             "description": "A weekly program focusing on physical activities and social engagement for seniors.",
             "volunteerInfo": {
                 "tasksDescription": "Help with game setup, engage seniors in board games and card games, assist with mobility",
                 "staffPresent": ["Jennifer Wong", "Kevin Tan", "Lisa Koh"],
-                "contactICName": "Jennifer Wong",
-                "contactICPhone": "+65 9123 8765",
-                "meetingPoint": "Yishun MRT Exit 2 at 11:30am",
-                "isVolunteerFull": false
+                "nVolunteersRequired":5,
+                "nVolunteersRegistered":2
             }
         }
     },
@@ -85,17 +85,17 @@
             "imageUrl": "https://placehold.co/100x100?text=Ser",
             "isWheelchairAccessible": true,
             "minDaysRequired": 3,
-            "contactIC": "12345678",
+            "contactICName": "Jennifer Wong",
+            "contactICPhone": "+65 9123 8765",
+            "meetingPoint": "Yishun MRT Exit 2 at 11:30am",
             "cost": 5,
             "location": "Community Center Room 2",
             "description": "A weekly program focusing on physical activities and social engagement for seniors.",
             "volunteerInfo": {
                 "tasksDescription": "Support arts and crafts activities, help distribute materials, assist seniors with painting and drawing",
                 "staffPresent": ["Jennifer Wong", "Amy Lim", "Thomas Yeo"],
-                "contactICName": "Jennifer Wong",
-                "contactICPhone": "+65 9123 8765",
-                "meetingPoint": "Yishun MRT Exit 2 at 11:30am",
-                "isVolunteerFull": true
+                "nVolunteersRequired":4,
+                "nVolunteersRegistered":4
             }
         }
     }

@@ -38,7 +38,11 @@ const VolunteerCalendar = () => {
         const flattened = flattenEvent(clickedEvent);
         
         // Check if volunteer quota is full
-        if (flattened.volunteerInfo?.isVolunteerFull) {
+        const volunteerInfo = flattened.volunteerInfo;
+        const isVolunteerFull = volunteerInfo && 
+            volunteerInfo.nVolunteersRegistered >= volunteerInfo.nVolunteersRequired;
+    
+        if (isVolunteerFull) {
             showAlert("Volunteer quota reached. Thank you for your interest!", 'info');
             return;
         }
@@ -81,7 +85,8 @@ const VolunteerCalendar = () => {
 
     const renderEventContent = (eventInfo) => {
         const { imageUrl, isWheelchairAccessible, volunteerInfo } = eventInfo.event.extendedProps;
-        const isVolunteerFull = volunteerInfo?.isVolunteerFull || false;
+        const isVolunteerFull = volunteerInfo && 
+            volunteerInfo.nVolunteersRegistered >= volunteerInfo.nVolunteersRequired;
         
         return (
             <div className={`volunteer-event-wrapper ${isVolunteerFull ? 'volunteer-full' : ''}`}>
@@ -134,7 +139,7 @@ const VolunteerCalendar = () => {
                                 <p>{new Date(item.start).toLocaleDateString()} at {new Date(item.start).toLocaleTimeString()}</p>
                                 {item.volunteerInfo && (
                                     <p style={{ fontSize: '0.9em', color: '#666' }}>
-                                        📍 {item.volunteerInfo.meetingPoint}
+                                        📍 {item.meetingPoint}
                                     </p>
                                 )}
                             </div>
@@ -226,10 +231,10 @@ const VolunteerCalendar = () => {
                                         
                                         <p><strong>👥 Staff Present:</strong> {selectedEvent.volunteerInfo.staffPresent.join(', ')}</p>
                                         
-                                        <p><strong>📞 Contact Person:</strong> {selectedEvent.volunteerInfo.contactICName}</p>
-                                        <p><strong>📱 Contact Phone:</strong> {selectedEvent.volunteerInfo.contactICPhone}</p>
+                                        <p><strong>📞 Contact Person:</strong> {selectedEvent.contactICName}</p>
+                                        <p><strong>📱 Contact Phone:</strong> {selectedEvent.contactICPhone}</p>
                                         
-                                        <p><strong>📍 Meeting Point:</strong> {selectedEvent.volunteerInfo.meetingPoint}</p>
+                                        <p><strong>📍 Meeting Point:</strong> {selectedEvent.meetingPoint}</p>
                                         
                                     </div>
                                 </div>

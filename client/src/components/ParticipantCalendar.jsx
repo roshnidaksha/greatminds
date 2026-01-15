@@ -45,6 +45,11 @@ const ParticipantCalendar = () => {
             showAlert("This event is already in your selected activities.", 'error');
             return;
         }
+        // Add meeting preference property
+        const eventWithPreference = {
+            ...event,
+            meetingPreference: null 
+        };
         setBasket([...basket, event]);
         setIsDetailModalOpen(false);
         setIsBasketOpen(true);
@@ -84,7 +89,38 @@ const ParticipantCalendar = () => {
     };
 
     const BasketView = ({ basket, onRemove, onCheckout }) => {
+        const [meetingPreferences, setMeetingPreferences] = useState(
+            basket.reduce((acc, item) => {
+                acc[item.id] = item.meetingPreference || 'meeting-point';
+                return acc;
+            }, {})
+        );
+
+        const updateMeetingPreference = (eventId, preference) => {
+            setMeetingPreferences({
+                ...meetingPreferences,
+                [eventId]: preference
+            });
+            // Update the basket item
+            const updatedBasket = basket.map(item => 
+                item.id === eventId ? { ...item, meetingPreference: preference } : item
+            );
+        };
+
+            
         const validateCommitments = () => {
+            // Check if all items have meeting preference selected
+            const allHavePreference = basket.every(item => 
+                meetingPreferences[item.id]
+            );
+            
+            if (!allHavePreference) {
+                return {
+                    valid: false,
+                    msg: 'Please select meeting point for all activities.'
+                };
+            }
+
             const groups = basket.reduce((acc, item) => {
                 if (item.isSeries) {
                     acc[item.seriesId] = (acc[item.seriesId] || 0) + 1;
@@ -112,9 +148,36 @@ const ParticipantCalendar = () => {
             <div className="basket-sidebar">
                 <h3>Your Selection ({basket.length})</h3>
                 {basket.map(item => (
-                    <div key={item.id} className="basket-item">
-                        <span>{item.title} - {new Date(item.start).toLocaleDateString()}</span>
-                        <button onClick={() => onRemove(item.id)}>❌</button>
+                    <div key={item.id} className="basket-item-container">
+                        <div className="basket-item">
+                            <span>{item.title} - {new Date(item.start).toLocaleDateString()}</span>
+                            <button onClick={() => onRemove(item.id)}>❌</button>
+                        </div>
+                        
+                        {/* Meeting Point Selection */}
+                        <div className="meeting-selection">
+                            <label style={{ fontSize: '12px', fontWeight: '500', display: 'block', marginBottom: '5px' }}>
+                                Meeting Point:
+                            </label>
+                            <select 
+                                value={meetingPreferences[item.id] || 'meeting-point'}
+                                onChange={(e) => updateMeetingPreference(item.id, e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '5px',
+                                    borderRadius: '4px',
+                                    border: '1px solid #ddd',
+                                    fontSize: '11px'
+                                }}
+                            >
+                                <option value="meeting-point">
+                                    {item.meetingPoint || 'Designated Meeting Point'}
+                                </option>
+                                <option value="direct-location">
+                                    Meet directly at {item.location || 'venue'}
+                                </option>
+                            </select>
+                        </div>
                     </div>
                 ))}
 
@@ -133,6 +196,9 @@ const ParticipantCalendar = () => {
         );
     }
 
+
+
+
     const SummaryScreen = ({ basket, onBack, onConfirm }) => {
         return (
             <div className="summary-container">
@@ -146,6 +212,11 @@ const ParticipantCalendar = () => {
                             <div>
                                 <h3>{item.title}</h3>
                                 <p>{new Date(item.start).toLocaleDateString()} at {new Date(item.start).toLocaleTimeString()}</p>
+                                <p style={{ fontSize: '0.85em', color: '#666', marginTop: '4px' }}>
+                                    📍 {item.meetingPreference === 'meeting-point' 
+                                        ? item.meetingPoint 
+                                        : `Direct at ${item.location}`}
+                                </p>
                             </div>
                         </div>
                     ))}
@@ -176,6 +247,7 @@ const ParticipantCalendar = () => {
             {currentView === 'basket' && isBasketOpen && (
                 <BasketView
                     basket={basket}
+                    setBasket={setBasket} 
                     onRemove={onRemove}
                     onCheckout={onCheckout}
                 />
@@ -225,7 +297,8 @@ const ParticipantCalendar = () => {
                                     ? `${selectedEvent.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${selectedEvent.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
                                     : 'All day'}</p>
                                 <p><strong>📍 Location:</strong> {selectedEvent.location || 'TBA'}</p>
-                                <p><strong>📞 Contact IC:</strong> {selectedEvent.contactIC || 'N/A'}</p>
+                                <p><strong>📞 Contact Person:</strong> {selectedEvent.contactICName}</p>
+                                <p><strong>📱 Contact Phone:</strong> {selectedEvent.contactICPhone}</p>
                                 <p><strong>💲 Cost:</strong> {selectedEvent.cost ? `$${selectedEvent.cost.toFixed(2)}` : 'Free'}</p>
                             </div>
 
