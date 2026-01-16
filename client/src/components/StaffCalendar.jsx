@@ -33,10 +33,14 @@ const StaffCalendar = () => {
         selectedImage: activityImages[0].url,
         selectedDays: [],
         commitment: 1,
-        contactIC: '',
+        contactICName: '',
+        contactICPhone: '',
         cost: '',
         location: '',
-        description: ''
+        meetingPoint: '',
+        description: '',
+        nVolunteersRequired: 0,
+        tasksDescription: ''
     });
 
     const handleDateClick = (arg) => {
@@ -85,10 +89,17 @@ const StaffCalendar = () => {
                     isWheelchairAccessible: formData.isWheelchairAccessible,
                     imageUrl: formData.selectedImage,
                     minDaysRequired: 1,
-                    contactIC: formData.contactIC,
+                    contactICName: formData.contactICName,
+                    contactICPhone: formData.contactICPhone,
                     cost: Number.isFinite(costValue) ? costValue : null,
                     location: formData.location,
-                    description: formData.description
+                    meetingPoint: formData.meetingPoint,
+                    description: formData.description,
+                    volunteerInfo: {
+                        tasksDescription: formData.tasksDescription,
+                        nVolunteersRequired: formData.nVolunteersRequired,
+                        nVolunteersRegistered: 0
+                    }
                 }
             });
         } else {
@@ -111,10 +122,17 @@ const StaffCalendar = () => {
                         isWheelchairAccessible: formData.isWheelchairAccessible,
                         imageUrl: formData.selectedImage,
                         minDaysRequired: formData.commitment,
-                        contactIC: formData.contactIC,
+                        contactICName: formData.contactICName,
+                        contactICPhone: formData.contactICPhone,
                         cost: Number.isFinite(costValue) ? costValue : null,
                         location: formData.location,
-                        description: formData.description
+                        meetingPoint: formData.meetingPoint,
+                        description: formData.description,
+                        volunteerInfo: {
+                            tasksDescription: formData.tasksDescription,
+                            nVolunteersRequired: formData.nVolunteersRequired,
+                            nVolunteersRegistered: 0
+                        }
                     }
                 });
             });

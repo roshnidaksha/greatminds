@@ -84,42 +84,94 @@ export default function UpdateEventForm({ formData, setFormData, handleSave }) {
                     </div>
                 </div>
 
-                <div>
-                    <label className="form-label">
-                        Location
-                    </label>
-                    <input
-                        type="text"
-                        value={formData.location}
-                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                        className="form-input"
-                    />
+                <div className="form-grid-col-2">
+                    <div>
+                        <label className="form-label">
+                            Location
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.location}
+                            onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                            className="form-input"
+                        />
+                    </div>
+                    <div>
+                        <label className="form-label">
+                            Meeting Point
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.meetingPoint}
+                            onChange={(e) => setFormData({ ...formData, meetingPoint: e.target.value })}
+                            className="form-input"
+                        />
+                    </div>
                 </div>
 
                 <div className="form-grid-col-2">
                     <div>
                         <label className="form-label">
-                            Contact IC
+                            Contact IC Name
                         </label>
                         <input
                             type="text"
-                            value={formData.contactIc}
-                            onChange={(e) => setFormData({ ...formData, contactIc: e.target.value })}
+                            value={formData.contactICName}
+                            onChange={(e) => setFormData({ ...formData, contactICName: e.target.value })}
                             className="form-input"
                         />
                     </div>
                     <div>
                         <label className="form-label">
-                            Cost ($)
+                            Contact IC Phone
                         </label>
                         <input
-                            type="number"
-                            value={formData.cost}
-                            onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
+                            type="text"
+                            value={formData.contactICPhone}
+                            onChange={(e) => setFormData({ ...formData, contactICPhone: e.target.value })}
                             className="form-input"
                         />
                     </div>
                 </div>
+
+                <div>
+                    <label className="form-label">
+                        Cost ($)
+                    </label>
+                    <input
+                        type="number"
+                        value={formData.cost}
+                        onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
+                        className="form-input"
+                    />
+                </div>
+
+                {formData.nVolunteersRequired > 0 && (
+                    <div className="form-grid-col-2">
+                        <div>
+                            <label className="form-label">
+                                Tasks Description
+                            </label>
+                            <input
+                                type="text"
+                                value={formData.taskDescription}
+                                onChange={(e) => setFormData({ ...formData, taskDescription: e.target.value })}
+                                className="form-input"
+                            />
+                        </div>
+                        <div>
+                            <label className="form-label">
+                                Number of volunteers required
+                            </label>
+                            <input
+                                type="number"
+                                value={formData.nVolunteersRequired}
+                                onChange={(e) => setFormData({ ...formData, nVolunteersRequired: e.target.value })}
+                                className="form-input"
+                            />
+                        </div>
+                    </div>
+                )}
 
                 <div>
                     <label className="checkbox-label">

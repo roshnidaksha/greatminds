@@ -19,10 +19,14 @@ export default function EventDetailsPage() {
         endTime: event?.end ? new Date(event.end).toTimeString().slice(0, 5) : "10:00",
         isWheelchairAccessible: event?.extendedProps?.isWheelchairAccessible || false,
         imageUrl: event?.extendedProps?.imageUrl || "",
-        contactIc: event?.extendedProps?.contactIc || "",
+        contactICName: event?.extendedProps?.contactICName || "",
+        contactICPhone: event?.extendedProps?.contactICPhone || "",
         cost: event?.extendedProps?.cost || "",
         location: event?.extendedProps?.location || "",
-        description: event?.extendedProps?.description || ""
+        meetingPoint: event?.extendedProps?.meetingPoint || "",
+        description: event?.extendedProps?.description || "",
+        nVolunteersRequired: event?.extendedProps?.volunteerInfo?.nVolunteersRequired || 0,
+        tasksDescription: event?.extendedProps?.volunteerInfo?.tasksDescription || ""
     });
 
     const { participants, setParticipants, volunteers, setVolunteers } = useEventRegistrations(event?.id);
@@ -39,10 +43,17 @@ export default function EventDetailsPage() {
                 ...event.extendedProps,
                 isWheelchairAccessible: formData.isWheelchairAccessible,
                 imageUrl: formData.imageUrl,
-                contactIc: formData.contactIc,
+                contactICName: formData.contactICName,
+                contactICPhone: formData.contactICPhone,
                 cost: formData.cost === '' ? null : parseFloat(formData.cost),
                 location: formData.location,
-                description: formData.description
+                meetingPoint: formData.meetingPoint,
+                description: formData.description,
+                volunteerInfo: {
+                    ...event.extendedProps.volunteerInfo,
+                    tasksDescription: formData.tasksDescription,
+                    nVolunteersRequired: formData.nVolunteersRequired
+                }
             }
         };
 

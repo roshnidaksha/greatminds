@@ -44,13 +44,26 @@ export default function CreateEventModal({
                         placeholder="e.g., Music Therapy"
                     />
 
-                    <label>Contact IC</label>
-                    <input
-                        type="text"
-                        placeholder="e.g., Jane Doe"
-                        value={formData.contactIC}
-                        onChange={(e) => setFormData({ ...formData, contactIC: e.target.value })}
-                    />
+                    <div className="time-row">
+                        <div>
+                            <label>Contact IC Name</label>
+                            <input
+                                type="text"
+                                placeholder="e.g., Jane Doe"
+                                value={formData.contactIC}
+                                onChange={(e) => setFormData({ ...formData, contactIC: e.target.value })}
+                            />
+                        </div>
+                        <div>
+                            <label>Contact IC Phone</label>
+                            <input
+                                type="text"
+                                placeholder="e.g., +65 9123 4567"
+                                value={formData.contactICPhone}
+                                onChange={(e) => setFormData({ ...formData, contactICPhone: e.target.value })}
+                            />
+                        </div>
+                    </div>
 
                     <label>Cost</label>
                     <input
@@ -68,6 +81,14 @@ export default function CreateEventModal({
                         placeholder="e.g., Community Hall Room 2"
                         value={formData.location}
                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    />
+
+                    <label>Meeting Point</label>
+                    <input
+                        type="text"
+                        placeholder="e.g., Woodlands MRT Exit B at 9am"
+                        value={formData.meetingPoint}
+                        onChange={(e) => setFormData({ ...formData, meetingPoint: e.target.value })}
                     />
 
                     <label>Description</label>
@@ -133,11 +154,34 @@ export default function CreateEventModal({
                         />
                         Wheelchair Accessible
                     </label>
-                </div>
 
-                <div className="modal-actions">
-                    <button className="save-btn" onClick={onSave}>Save Activity</button>
-                    <button className="cancel-btn" onClick={onClose}>Cancel</button>
+                    {/* Show volunteer section only if user needs volunteers */}
+                    <label>Number of Volunteers Required</label>
+                    <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        placeholder="e.g., 10"
+                        value={formData.nVolunteersRequired}
+                        onChange={(e) => setFormData({ ...formData, nVolunteersRequired: e.target.value })}
+                    />
+
+                    {formData.nVolunteersRequired > 0 && (
+                        <div>
+                            <label>Tasks Description</label>
+                            <textarea
+                                rows={3}
+                                placeholder="Brief description of the volunteer tasks"
+                                value={formData.tasksDescription}
+                                onChange={(e) => setFormData({ ...formData, tasksDescription: e.target.value })}
+                            />
+                        </div>
+                    )}
+
+                    <div className="modal-actions">
+                        <button className="save-btn" onClick={onSave}>Save Activity</button>
+                        <button className="cancel-btn" onClick={onClose}>Cancel</button>
+                    </div>
                 </div>
             </div>
         </div>
