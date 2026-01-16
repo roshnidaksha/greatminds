@@ -3,6 +3,9 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
+import { db } from '../../firebase/firebaseConfig';
+import { collection, addDoc, Timestamp } from "firebase/firestore";
+
 import { useAuth } from "../../context/AuthContext";
 import { useEvents } from '../../hooks/useEvents';
 import { validateEventSelection } from '../../utils/conflictChecker';
@@ -25,7 +28,6 @@ const ParticipantCalendar = () => {
         setTimeout(() => setAlert(null), 3000);
     };
 
-    // Helper function to flatten event data into a simple shape
     const flattenEvent = (event) => {
         if (!event) return null;
         const ext = event.extendedProps || {};
@@ -80,7 +82,34 @@ const ParticipantCalendar = () => {
         setCurrentView('summary');
     };
 
-    const handleFinalConfirm = () => {
+    const handleFinalConfirm = async () => {
+        const registrations = [];
+        
+        const createRegistrationObject = (eventId, seriesId, meetingPoint) => ({
+            userId: user.uid,
+            eventId: eventId,
+            seriesId: seriesId || null,
+            meetingPoint: meetingPoint,
+            timestamp: Timestamp.now(),
+            status: 'registered',
+            attendance: null
+        })
+
+        basket.forEach(item => {
+            registrations.push(
+                createRegistrationObject(item.id, item.seriesId, item.meetingPreference)
+            );
+        });
+
+        try {
+            const registrationsRef = collection(db, "registrations");
+            const uploadPromises = registrations.map(reg => addDoc(registrationsRef, reg));
+            await Promise.all(uploadPromises);
+        } catch (error) {
+            showAlert("Error during registration. Please try again.", 'error');
+            return;
+        }
+
         showAlert("Success! Your registration is complete and staff have been notified.", 'success');
         setBasket([]);
         setIsBasketOpen(false);
@@ -111,15 +140,15 @@ const ParticipantCalendar = () => {
                 ...meetingPreferences,
                 [eventId]: preference
             });
-            // Update the basket item
+
             const updatedBasket = basket.map(item =>
                 item.id === eventId ? { ...item, meetingPreference: preference } : item
             );
+            setBasket(updatedBasket);
         };
 
 
         const validateCommitments = () => {
-            // Check if all items have meeting preference selected
             const allHavePreference = basket.every(item =>
                 meetingPreferences[item.id]
             );
@@ -205,8 +234,6 @@ const ParticipantCalendar = () => {
             </div>
         );
     }
-
-
 
 
     const SummaryScreen = ({ basket, onBack, onConfirm }) => {

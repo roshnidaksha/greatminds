@@ -3,6 +3,9 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
+import { db } from '../../firebase/firebaseConfig';
+import { collection, addDoc, Timestamp } from "firebase/firestore";
+
 import { useAuth } from "../../context/AuthContext";
 import { useEvents } from '../../hooks/useEvents';
 import { validateEventSelection } from '../../utils/conflictChecker';
@@ -41,7 +44,6 @@ const VolunteerCalendar = () => {
         const clickedEvent = info.event;
         const flattened = flattenEvent(clickedEvent);
 
-        // Check if volunteer quota is full
         const volunteerInfo = flattened.volunteerInfo;
         const isVolunteerFull = volunteerInfo &&
             volunteerInfo.nVolunteersRegistered >= volunteerInfo.nVolunteersRequired;
@@ -87,7 +89,33 @@ const VolunteerCalendar = () => {
         setCurrentView('summary');
     };
 
-    const handleFinalConfirm = () => {
+    const handleFinalConfirm = async () => {
+        const registrations = [];
+
+        const createRegistrationObject = (eventId, seriesId) => ({
+            userId: user.uid,
+            eventId: eventId,
+            seriesId: seriesId || null,
+            timestamp: Timestamp.now(),
+            status: 'registered',
+            attendance: null
+        })
+
+        basket.forEach(item => {
+            registrations.push(
+                createRegistrationObject(item.id, item.seriesId, item.meetingPreference)
+            );
+        });
+
+        try {
+            const registrationsRef = collection(db, "registrations");
+            const uploadPromises = registrations.map(reg => addDoc(registrationsRef, reg));
+            await Promise.all(uploadPromises);
+        } catch (error) {
+            showAlert("Error during registration. Please try again.", 'error');
+            return;
+        }
+
         showAlert("Success! Your volunteer registration is confirmed and staff have been notified.", 'success');
         setBasket([]);
         setIsBasketOpen(false);
