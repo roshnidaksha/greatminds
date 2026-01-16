@@ -23,10 +23,8 @@ const VolunteerCalendar = () => {
     const [currentView, setCurrentView] = useState('basket');
     const [alert, setAlert] = useState(null);
 
-    // User volunteer registrations
     const [userRegistrations, setUserRegistrations] = useState([]);
 
-    // Fetch user registrations from Firestore
     useEffect(() => {
         const fetchRegistrations = async () => {
             if (!user?.uid) return;
@@ -50,7 +48,6 @@ const VolunteerCalendar = () => {
         fetchRegistrations();
     }, [user?.uid]);
 
-    // Get registration status for an event
     const getRegistrationStatus = (eventId) => {
         const registration = userRegistrations.find(reg => reg.eventId === eventId);
         return registration?.status || null;
@@ -131,7 +128,8 @@ const VolunteerCalendar = () => {
             seriesId: seriesId || null,
             timestamp: Timestamp.now(),
             status: 'registered',
-            attendance: null
+            attendance: null,
+            roleAtRegistration: 'volunteer'
         })
 
         basket.forEach(item => {
@@ -156,6 +154,7 @@ const VolunteerCalendar = () => {
     };
 
     const renderEventContent = (eventInfo) => {
+        console.log(eventInfo.event.extendedProps.volunteerInfo);
         const { imageUrl, isWheelchairAccessible, volunteerInfo } = eventInfo.event.extendedProps;
         const isVolunteerFull = volunteerInfo &&
             volunteerInfo.nVolunteersRegistered >= volunteerInfo.nVolunteersRequired;

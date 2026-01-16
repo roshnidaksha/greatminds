@@ -102,7 +102,6 @@ const StaffCalendar = () => {
                 volunteerInfo: {
                     tasksDescription: formData.tasksDescription,
                     nVolunteersRequired: Number(formData.nVolunteersRequired) || 0,
-                    nVolunteersRegistered: 0
                 }
             },
             createdAt: Timestamp.now()

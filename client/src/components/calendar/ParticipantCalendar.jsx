@@ -231,7 +231,8 @@ const ParticipantCalendar = () => {
             meetingPoint: meetingPoint,
             timestamp: Timestamp.now(),
             status: 'registered',
-            attendance: null
+            attendance: null,
+            roleAtRegistration: 'participant'
         })
 
         basket.forEach(item => {
