@@ -37,7 +37,7 @@ export default function RosterTable({ title, people, onStatusChange, isParticipa
                                 >
                                     <option value="registered">Registered</option>
                                     <option value="confirmed">Confirmed</option>
-                                    <option value="waitlisted">Waitlisted</option>
+                                    {isParticipant && <option value="waitlisted">Waitlisted</option>}
                                 </select>
                             </td>
                         </tr>
