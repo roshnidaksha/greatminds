@@ -6,13 +6,13 @@ import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/fire
 
 // Your Firebase config
 const firebaseConfig = {
-    apiKey: "AIzaSyDGtQ73FZPs8rtf3Odg4rz4duUOKSULgHM",
-    authDomain: "greatminds-52fd1.firebaseapp.com",
-    projectId: "greatminds-52fd1",
-    storageBucket: "greatminds-52fd1.firebasestorage.app",
-    messagingSenderId: "395788499346",
-    appId: "1:395788499346:web:64fe68f3090c2b38a6a94b",
-    measurementId: "G-C36N817DWZ"
+    apiKey: "AIzaSyDQ-l6rvz_Z0yDIdhwEe3nxTPTEiSi_fTI",
+    authDomain: "greatminds-d4d94.firebaseapp.com",
+    projectId: "greatminds-d4d94",
+    storageBucket: "greatminds-d4d94.firebasestorage.app",
+    messagingSenderId: "814737238809",
+    appId: "1:814737238809:web:6df18da40f47a08493b388",
+    measurementId: "G-872B2F4FNL"
 };
 
 // Initialize Firebase
