@@ -9,6 +9,44 @@
     z-index: 1000;
 }
 
+/* Registration status highlighting for volunteers */
+.volunteer-event-wrapper.status-registered {
+    background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+}
+
+.volunteer-event-wrapper.status-confirmed {
+    background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+}
+
+.volunteer-event-wrapper.status-waitlisted {
+    background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%);
+}
+
+.registration-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: rgba(255, 255, 255, 0.95);
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: bold;
+    z-index: 10;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.status-registered .registration-badge {
+    color: #f57f17;
+}
+
+.status-confirmed .registration-badge {
+    color: #2e7d32;
+}
+
+.status-waitlisted .registration-badge {
+    color: #1565c0;
+}
+
 .modal-content {
     background: #fff;
     color: #0b3c91;

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
 import { db } from '../../firebase/firebaseConfig';
-import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { collection, addDoc, Timestamp, query, where, getDocs } from "firebase/firestore";
 
 import { useAuth } from "../../context/AuthContext";
 import { useEvents } from '../../hooks/useEvents';
@@ -22,6 +22,39 @@ const VolunteerCalendar = () => {
     const [isBasketOpen, setIsBasketOpen] = useState(false);
     const [currentView, setCurrentView] = useState('basket');
     const [alert, setAlert] = useState(null);
+
+    // User volunteer registrations
+    const [userRegistrations, setUserRegistrations] = useState([]);
+
+    // Fetch user registrations from Firestore
+    useEffect(() => {
+        const fetchRegistrations = async () => {
+            if (!user?.uid) return;
+            
+            try {
+                const q = query(
+                    collection(db, "volunteerRegistrations"),
+                    where("userId", "==", user.uid)
+                );
+                const querySnapshot = await getDocs(q);
+                const registrations = [];
+                querySnapshot.forEach((doc) => {
+                    registrations.push({ id: doc.id, ...doc.data() });
+                });
+                setUserRegistrations(registrations);
+            } catch (error) {
+                console.error("Error fetching volunteer registrations:", error);
+            }
+        };
+
+        fetchRegistrations();
+    }, [user?.uid]);
+
+    // Get registration status for an event
+    const getRegistrationStatus = (eventId) => {
+        const registration = userRegistrations.find(reg => reg.eventId === eventId);
+        return registration?.status || null;
+    };
 
     const showAlert = (message, type = 'info') => {
         setAlert({ message, type });
@@ -126,16 +159,24 @@ const VolunteerCalendar = () => {
         const { imageUrl, isWheelchairAccessible, volunteerInfo } = eventInfo.event.extendedProps;
         const isVolunteerFull = volunteerInfo &&
             volunteerInfo.nVolunteersRegistered >= volunteerInfo.nVolunteersRequired;
+        const registrationStatus = getRegistrationStatus(eventInfo.event.id);
 
         return (
-            <div className={`volunteer-event-wrapper ${isVolunteerFull ? 'volunteer-full' : ''}`}>
+            <div className={`volunteer-event-wrapper ${isVolunteerFull ? 'volunteer-full' : ''} ${registrationStatus ? `status-${registrationStatus}` : ''}`}>
                 <CalendarEventCard
                     title={eventInfo.event.title}
                     imageUrl={imageUrl}
                     isWheelchairAccessible={isWheelchairAccessible}
                 />
-                {isVolunteerFull && (
+                {isVolunteerFull && !registrationStatus && (
                     <div className="volunteer-full-badge">✓ Full</div>
+                )}
+                {registrationStatus && (
+                    <div className="registration-badge">
+                        {registrationStatus === 'registered' && '📝 Registered'}
+                        {registrationStatus === 'confirmed' && '✅ Confirmed'}
+                        {registrationStatus === 'waitlisted' && '⏳ Waitlisted'}
+                    </div>
                 )}
             </div>
         );

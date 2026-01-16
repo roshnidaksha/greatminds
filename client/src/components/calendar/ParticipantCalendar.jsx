@@ -4,7 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
 import { db } from '../../firebase/firebaseConfig';
-import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { collection, addDoc, Timestamp, query, where, getDocs } from "firebase/firestore";
 
 import { useAuth } from "../../context/AuthContext";
 import { useEvents } from '../../hooks/useEvents';
@@ -14,18 +14,157 @@ import CalendarEventCard from './CalendarEventCard';
 
 const ParticipantCalendar = () => {
     const { user, role } = useAuth();
-    const { events, loading } = useEvents();
+    const { events: allEvents, loading } = useEvents();
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
+
+    // Add wheelchair filter toggle
+    const [showOnlyWheelchairAccessible, setShowOnlyWheelchairAccessible] = useState(false);
 
     const [basket, setBasket] = useState([]);
     const [isBasketOpen, setIsBasketOpen] = useState(false);
     const [currentView, setCurrentView] = useState('basket'); // 'basket' or 'summary'
     const [alert, setAlert] = useState(null); // { message, type: 'success'|'error'|'info' }
 
+    // Voice control state
+    const [isListening, setIsListening] = useState(false);
+    const [voiceCommand, setVoiceCommand] = useState('');
+
+    // User registrations
+    const [userRegistrations, setUserRegistrations] = useState([]);
+
+    // Fetch user registrations from Firestore
+    useEffect(() => {
+        const fetchRegistrations = async () => {
+            if (!user?.uid) return;
+            
+            try {
+                const q = query(
+                    collection(db, "registrations"),
+                    where("userId", "==", user.uid)
+                );
+                const querySnapshot = await getDocs(q);
+                const registrations = [];
+                querySnapshot.forEach((doc) => {
+                    registrations.push({ id: doc.id, ...doc.data() });
+                });
+                setUserRegistrations(registrations);
+            } catch (error) {
+                console.error("Error fetching registrations:", error);
+            }
+        };
+
+        fetchRegistrations();
+    }, [user?.uid]);
+
+    // Get registration status for an event
+    const getRegistrationStatus = (eventId) => {
+        const registration = userRegistrations.find(reg => reg.eventId === eventId);
+        return registration?.status || null;
+    };
+
+    // Filter events based on wheelchair accessibility
+    const events = showOnlyWheelchairAccessible 
+        ? allEvents.filter(event => event.extendedProps?.isWheelchairAccessible === true)
+        : allEvents;
+        
     const showAlert = (message, type = 'info') => {
         setAlert({ message, type });
         setTimeout(() => setAlert(null), 3000);
+    };
+
+    // Voice control functions
+    const speak = (text) => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.9;
+        window.speechSynthesis.speak(utterance);
+    };
+
+    const startVoiceRecognition = () => {
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            showAlert("Voice recognition not supported in this browser. Please use Chrome or Edge.", 'error');
+            return;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        
+        recognition.lang = 'en-US';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = () => {
+            setIsListening(true);
+            speak("Listening for your command");
+        };
+
+        recognition.onresult = (event) => {
+            const command = event.results[0][0].transcript.toLowerCase();
+            setVoiceCommand(command);
+            processVoiceCommand(command);
+        };
+
+        recognition.onerror = (event) => {
+            setIsListening(false);
+            showAlert("Voice recognition error. Please try again.", 'error');
+        };
+
+        recognition.onend = () => {
+            setIsListening(false);
+        };
+
+        recognition.start();
+    };
+
+    const processVoiceCommand = (command) => {
+
+        // Toggle wheelchair accessible events
+        if (command.includes("wheelchair") || command.includes("accessible")) {
+            setShowOnlyWheelchairAccessible(!showOnlyWheelchairAccessible);
+            speak(showOnlyWheelchairAccessible 
+                ? "Showing all events" 
+                : "Showing only wheelchair accessible events");
+            return;
+        }
+
+        // Show basket
+        if (command.includes("show basket") || command.includes("my selection")) {
+            if (basket.length > 0) {
+                setIsBasketOpen(true);
+                speak(`You have ${basket.length} activities in your selection`);
+            } else {
+                speak("Your basket is empty");
+            }
+            return;
+        }
+
+        // Confirm and checkout
+        if (command.includes("confirm") || command.includes("checkout")) {
+            if (basket.length > 0) {
+                onCheckout();
+                speak("Please review your selection");
+            } else {
+                speak("Your basket is empty. Please select activities first.");
+            }
+            return;
+        }
+
+        // Read available events
+        if (command.includes("read events") || command.includes("detail events")) {
+            const eventTitles = events.slice(0, 5).map(e => e.title).join(", ");
+            speak(`Available events include: ${eventTitles}`);
+            return;
+        }
+
+        // Help command
+        if (command.includes("help")) {
+            speak("You can say: show wheelchair events, show basket, confirm registration, or detail events.");
+            return;
+        }
+
+        // Default
+        speak("Sorry, I didn't understand that command. Say help for available commands.");
     };
 
     const flattenEvent = (event) => {
@@ -118,12 +257,23 @@ const ParticipantCalendar = () => {
 
     const renderEventContent = (eventInfo) => {
         const { imageUrl, isWheelchairAccessible } = eventInfo.event.extendedProps;
+        const registrationStatus = getRegistrationStatus(eventInfo.event.id);
+        
         return (
-            <CalendarEventCard
-                title={eventInfo.event.title}
-                imageUrl={imageUrl}
-                isWheelchairAccessible={isWheelchairAccessible}
-            />
+            <div className={`event-wrapper ${registrationStatus ? `status-${registrationStatus}` : ''}`}>
+                <CalendarEventCard
+                    title={eventInfo.event.title}
+                    imageUrl={imageUrl}
+                    isWheelchairAccessible={isWheelchairAccessible}
+                />
+                {registrationStatus && (
+                    <div className="registration-badge">
+                        {registrationStatus === 'registered' && '📝 Registered'}
+                        {registrationStatus === 'confirmed' && '✅ Confirmed'}
+                        {registrationStatus === 'waitlisted' && '⏳ Waitlisted'}
+                    </div>
+                )}
+            </div>
         );
     };
 
@@ -279,6 +429,42 @@ const ParticipantCalendar = () => {
             <header className="participant-header">
                 <h1>Available Activities</h1>
                 <p>Click on a picture to sign up!</p>
+
+                <div className="wheelchair-filter">
+                    <label className="toggle-label">
+                        <input
+                            type="checkbox"
+                            checked={showOnlyWheelchairAccessible}
+                            onChange={(e) => setShowOnlyWheelchairAccessible(e.target.checked)}
+                            className="toggle-checkbox"
+                        />
+                        <span className="toggle-text">
+                            Show only wheelchair accessible events ♿
+                        </span>
+                    </label>
+                </div>
+
+                {/* Voice Control Button */}
+                <div className="voice-control-section">
+                    <button 
+                        className={`voice-button ${isListening ? 'listening' : ''}`}
+                        onClick={startVoiceRecognition}
+                        disabled={isListening}
+                    >
+                        {isListening ? '🎤 Listening...' : '🎤 Voice Command'}
+                    </button>
+                    {voiceCommand && (
+                        <div className="voice-feedback">
+                            You said: "{voiceCommand}"
+                        </div>
+                    )}
+                    <button 
+                        className="help-button"
+                        onClick={() => speak("Say: show wheelchair events, show basket, confirm registration, or read events")}
+                    >
+                        ℹ️ Voice Help
+                    </button>
+                </div>
             </header>
 
             {currentView === 'basket' && isBasketOpen && (
