@@ -10,6 +10,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useEvents } from '../../hooks/useEvents';
 import { validateEventSelection } from '../../utils/conflictChecker';
 import './ParticipantCalendar.css';
+import { showAlert } from '../../utils/alerts';
 import CalendarEventCard from './CalendarEventCard';
 
 const ParticipantCalendar = () => {
@@ -67,11 +68,6 @@ const ParticipantCalendar = () => {
     const events = showOnlyWheelchairAccessible 
         ? allEvents.filter(event => event.extendedProps?.isWheelchairAccessible === true)
         : allEvents;
-        
-    const showAlert = (message, type = 'info') => {
-        setAlert({ message, type });
-        setTimeout(() => setAlert(null), 3000);
-    };
 
     // Voice control functions
     const speak = (text) => {
@@ -83,7 +79,7 @@ const ParticipantCalendar = () => {
 
     const startVoiceRecognition = () => {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            showAlert("Voice recognition not supported in this browser. Please use Chrome or Edge.", 'error');
+            showAlert(setAlert, "Voice recognition not supported in this browser. Please use Chrome or Edge.", 'error');
             return;
         }
 
@@ -107,7 +103,7 @@ const ParticipantCalendar = () => {
 
         recognition.onerror = (event) => {
             setIsListening(false);
-            showAlert("Voice recognition error. Please try again.", 'error');
+            showAlert(setAlert, "Voice recognition error. Please try again.", 'error');
         };
 
         recognition.onend = () => {
@@ -187,13 +183,13 @@ const ParticipantCalendar = () => {
 
     const handleSelectEvent = async (event) => {
         if (basket.some(e => e.id === event.id)) {
-            showAlert("This event is already in your selected activities.", 'error');
+            showAlert(setAlert, "This event is already in your selected activities.", 'error');
             return;
         }
 
         const result = await validateEventSelection(event, basket, user.uid);
         if (!result.isValid) {
-            showAlert(result.message, 'error');
+            showAlert(setAlert, result.message, 'error');
             return;
         }
 
@@ -205,7 +201,7 @@ const ParticipantCalendar = () => {
         setIsDetailModalOpen(false);
         setIsBasketOpen(true);
         setCurrentView('basket');
-        showAlert("Added to your selection.", 'success');
+        showAlert(setAlert, "Added to your selection.", 'success');
     }
 
     const onRemove = (eventId) => {
@@ -246,11 +242,11 @@ const ParticipantCalendar = () => {
             const uploadPromises = registrations.map(reg => addDoc(registrationsRef, reg));
             await Promise.all(uploadPromises);
         } catch (error) {
-            showAlert("Error during registration. Please try again.", 'error');
+            showAlert(setAlert, "Error during registration. Please try again.", 'error');
             return;
         }
 
-        showAlert("Success! Your registration is complete and staff have been notified.", 'success');
+        showAlert(setAlert, "Success! Your registration is complete and staff have been notified.", 'success');
         setBasket([]);
         setIsBasketOpen(false);
         setCurrentView('calendar');

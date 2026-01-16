@@ -9,9 +9,11 @@ import { useEventRegistrations } from "../hooks/useEventRegistrations";
 import { useConfirmation } from "../hooks/useConfirmation";
 import RosterTable from "../components/RosterTable";
 import AttendanceTracker from "../components/AttendanceTracker";
+import { showAlert } from '../utils/alerts';
 import "./EventDetailsPage.css";
 
 export default function EventDetailsPage() {
+    const [alert, setAlert] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
     const { event, onUpdate } = location.state || {};
@@ -92,8 +94,7 @@ export default function EventDetailsPage() {
                 await updateDoc(docRef, updatedFields);
             }
         } catch (error) {
-            console.error("Error updating event: ", error);
-            alert("Failed to update event. Please try again.");
+            showAlert(setAlert, "Failed to update event. Please try again.", 'error');
         }
 
         navigate(-1)
@@ -103,8 +104,6 @@ export default function EventDetailsPage() {
         const isSeriesEvent = event?.isSeries ?? event?.extendedProps?.isSeries;
         const seriesId = event?.seriesId ?? event?.extendedProps?.seriesId;
         const eventId = event?.id;
-
-        console.log("Deleting event:", { eventId, isSeriesEvent, seriesId }); // Debug log
 
         // Confirm deletion
         const confirmMessage = isSeriesEvent 
@@ -116,6 +115,8 @@ export default function EventDetailsPage() {
         }
 
         try {
+            let alertMsg = "";
+            let alertType = "info";
             if (isSeriesEvent && seriesId) {
                 // Delete all events in the series
                 const batch = writeBatch(db);
@@ -125,40 +126,39 @@ export default function EventDetailsPage() {
                 );
                 const querySnapshot = await getDocs(q);
 
-                console.log(`Found ${querySnapshot.size} events in series to delete`); // Debug log
-
                 if (querySnapshot.empty) {
-                    alert("No events found in this series.");
+                    alertMsg = "No events found in the series.";
+                    showAlert(setAlert, alertMsg, "info");
                     return;
                 }
 
                 querySnapshot.forEach((document) => {
-                    console.log("Deleting document:", document.id); // Debug log
                     const docRef = doc(db, "events", document.id);
                     batch.delete(docRef);
                 });
 
                 await batch.commit();
-                alert(`Successfully deleted ${querySnapshot.size} events in the series.`);
+                alertMsg = `Successfully deleted ${querySnapshot.size} events in the series.`;
+                alertType = "success";
             } else {
                 // Delete single event
                 if (!eventId) {
-                    alert("Error: Event ID is missing.");
-                    console.error("Event data:", event);
+                    alertMsg = "Error: Event ID is missing.";
+                    alertType = "error";
+                    showAlert(setAlert, alertMsg, alertType);
                     return;
                 }
 
-                console.log("Deleting single event with ID:", eventId); // Debug log
                 const docRef = doc(db, "events", eventId);
                 await deleteDoc(docRef);
-                alert("Event deleted successfully.");
+                alertMsg = "Event deleted successfully.";
+                alertType = "success";
             }
-
-            navigate(-1);
+            const alertDurationMs = 1000;
+            showAlert(setAlert, alertMsg, alertType, alertDurationMs);
+            setTimeout(() => navigate(-1), alertDurationMs);
         } catch (error) {
-            console.error("Error deleting event:", error);
-            console.error("Error details:", error.message, error.code);
-            alert(`Failed to delete event: ${error.message}`);
+            showAlert(setAlert, `Failed to delete event: ${error.message}`, 'error');
         }
     };
 
@@ -206,6 +206,11 @@ export default function EventDetailsPage() {
 
     return (
         <div className="event-details-page">
+            {alert && (
+                <div className={`toast toast-${alert.type}`}>
+                    {alert.message}
+                </div>
+            )}
             <div className="event-details-container">
                 <button
                     onClick={() => navigate(-1)}

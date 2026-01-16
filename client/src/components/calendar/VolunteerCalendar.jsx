@@ -10,6 +10,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useEvents } from '../../hooks/useEvents';
 import { validateEventSelection } from '../../utils/conflictChecker';
 import './VolunteerCalendar.css';
+import { showAlert } from '../../utils/alerts';
 import CalendarEventCard from './CalendarEventCard';
 
 const VolunteerCalendar = () => {
@@ -53,11 +54,6 @@ const VolunteerCalendar = () => {
         return registration?.status || null;
     };
 
-    const showAlert = (message, type = 'info') => {
-        setAlert({ message, type });
-        setTimeout(() => setAlert(null), 3000);
-    };
-
     const flattenEvent = (event) => {
         if (!event) return null;
         const ext = event.extendedProps || {};
@@ -79,7 +75,7 @@ const VolunteerCalendar = () => {
             volunteerInfo.nVolunteersRegistered >= volunteerInfo.nVolunteersRequired;
 
         if (isVolunteerFull) {
-            showAlert("Volunteer quota reached. Thank you for your interest!", 'info');
+            showAlert(setAlert, "Volunteer quota reached. Thank you for your interest!", 'info');
             return;
         }
 
@@ -89,13 +85,13 @@ const VolunteerCalendar = () => {
 
     const handleSelectEvent = async (event) => {
         if (basket.some(e => e.id === event.id)) {
-            showAlert("This event is already in your selected volunteer slots.", 'error');
+            showAlert(setAlert, "This event is already in your selected volunteer slots.", 'error');
             return;
         }
 
         const result = await validateEventSelection(event, basket, user.uid);
         if (!result.isValid) {
-            showAlert(result.message, 'error');
+            showAlert(setAlert, result.message, 'error');
             return;
         }
 
@@ -103,7 +99,7 @@ const VolunteerCalendar = () => {
         setIsDetailModalOpen(false);
         setIsBasketOpen(true);
         setCurrentView('basket');
-        showAlert("Added to your volunteer schedule.", 'success');
+        showAlert(setAlert, "Added to your volunteer schedule.", 'success');
     }
 
     const onRemove = (eventId) => {
@@ -143,18 +139,17 @@ const VolunteerCalendar = () => {
             const uploadPromises = registrations.map(reg => addDoc(registrationsRef, reg));
             await Promise.all(uploadPromises);
         } catch (error) {
-            showAlert("Error during registration. Please try again.", 'error');
+            showAlert(setAlert, "Error during registration. Please try again.", 'error');
             return;
         }
 
-        showAlert("Success! Your volunteer registration is confirmed and staff have been notified.", 'success');
+        showAlert(setAlert, "Success! Your volunteer registration is confirmed and staff have been notified.", 'success');
         setBasket([]);
         setIsBasketOpen(false);
         setCurrentView('calendar');
     };
 
     const renderEventContent = (eventInfo) => {
-        console.log(eventInfo.event.extendedProps.volunteerInfo);
         const { imageUrl, isWheelchairAccessible, volunteerInfo } = eventInfo.event.extendedProps;
         const isVolunteerFull = volunteerInfo &&
             volunteerInfo.nVolunteersRegistered >= volunteerInfo.nVolunteersRequired;

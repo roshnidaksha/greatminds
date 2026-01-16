@@ -12,6 +12,9 @@ export default function RosterTable({ title, people, onStatusChange, isParticipa
                         <th>Email</th>
                         <th>Phone</th>
                         <th>Status</th>
+                        {isParticipant && <th>Wheelchair?</th>}
+                        {isParticipant && <th>Meeting Point</th>}
+                        <th>Notes</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,6 +42,41 @@ export default function RosterTable({ title, people, onStatusChange, isParticipa
                                     <option value="confirmed">Confirmed</option>
                                     {isParticipant && <option value="waitlisted">Waitlisted</option>}
                                 </select>
+                            </td>
+                            {isParticipant && (
+                                <td className="icon-cell">
+                                    {person.isWheelchairAccessible ? (
+                                        <span
+                                            className="wc-icon"
+                                            title="Wheelchair"
+                                            aria-label="Wheelchair"
+                                        >
+                                            ♿
+                                        </span>
+                                    ) : (
+                                        <span
+                                            className="wc-icon wc-none"
+                                            title="No wheelchair"
+                                            aria-label="No wheelchair"
+                                        >
+                                            —
+                                        </span>
+                                    )}
+                                </td>
+                            )}
+                            {isParticipant && (<td>{person.meetingPoint || "N/A"}</td>)}
+                            <td className="icon-cell">
+                                {person.notes ? (
+                                    <span
+                                        className="note-icon"
+                                        title={person.notes}
+                                        aria-label={`Notes: ${person.notes}`}
+                                    >
+                                        📝
+                                    </span>
+                                ) : (
+                                    "—"
+                                )}
                             </td>
                         </tr>
                     ))}

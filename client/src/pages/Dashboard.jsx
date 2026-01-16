@@ -42,7 +42,8 @@ export default function Dashboard() {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    boxShadow: "0 6px 20px rgba(0,0,0,0.08)"
+                    boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+                    marginBottom: "24px"
                 }}
             >
                 <div>

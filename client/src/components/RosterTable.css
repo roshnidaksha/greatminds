@@ -41,3 +41,31 @@
     color: #975a16;
     border-color: #fbd38d;
 }
+
+/* Icon cell and tooltip affordances */
+.icon-cell {
+    text-align: center;
+    width: 80px;
+}
+
+.note-icon,
+.wc-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: help; /* indicates tooltip available */
+    transition: background-color 0.15s ease, opacity 0.15s ease;
+}
+
+.note-icon:hover,
+.wc-icon:hover {
+    background-color: #eef2ff;
+    opacity: 0.9;
+}
+
+.wc-none {
+    cursor: default;
+}
