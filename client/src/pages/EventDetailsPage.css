@@ -46,3 +46,29 @@
     background: #fff3cd;
 }
 
+/* Event actions header */
+.event-actions-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.delete-event-button {
+    padding: 10px 20px;
+    background: #f44336;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.delete-event-button:hover {
+    background: #d32f2f;
+}
+
+.delete-event-button:active {
+    transform: scale(0.98);
+}

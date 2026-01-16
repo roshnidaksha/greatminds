@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import { db } from '../firebase/firebaseConfig';
-import { doc, updateDoc, writeBatch, collection, query, where, getDocs, Timestamp } from "firebase/firestore";
+import { doc, updateDoc, writeBatch, collection, query, where, getDocs, Timestamp, deleteDoc} from "firebase/firestore";
 
 import UpdateEventForm from "../components/UpdateEventForm";
 import { useEventRegistrations } from "../hooks/useEventRegistrations";
@@ -99,6 +99,69 @@ export default function EventDetailsPage() {
         navigate(-1)
     };
 
+    const handleDelete = async () => {
+        const isSeriesEvent = event?.isSeries ?? event?.extendedProps?.isSeries;
+        const seriesId = event?.seriesId ?? event?.extendedProps?.seriesId;
+        const eventId = event?.id;
+
+        console.log("Deleting event:", { eventId, isSeriesEvent, seriesId }); // Debug log
+
+        // Confirm deletion
+        const confirmMessage = isSeriesEvent 
+            ? `Are you sure you want to delete ALL events in this series "${event.title}"?`
+            : `Are you sure you want to delete "${event.title}"?`;
+        
+        if (!window.confirm(confirmMessage)) {
+            return;
+        }
+
+        try {
+            if (isSeriesEvent && seriesId) {
+                // Delete all events in the series
+                const batch = writeBatch(db);
+                const q = query(
+                    collection(db, "events"),
+                    where("seriesId", "==", seriesId)
+                );
+                const querySnapshot = await getDocs(q);
+
+                console.log(`Found ${querySnapshot.size} events in series to delete`); // Debug log
+
+                if (querySnapshot.empty) {
+                    alert("No events found in this series.");
+                    return;
+                }
+
+                querySnapshot.forEach((document) => {
+                    console.log("Deleting document:", document.id); // Debug log
+                    const docRef = doc(db, "events", document.id);
+                    batch.delete(docRef);
+                });
+
+                await batch.commit();
+                alert(`Successfully deleted ${querySnapshot.size} events in the series.`);
+            } else {
+                // Delete single event
+                if (!eventId) {
+                    alert("Error: Event ID is missing.");
+                    console.error("Event data:", event);
+                    return;
+                }
+
+                console.log("Deleting single event with ID:", eventId); // Debug log
+                const docRef = doc(db, "events", eventId);
+                await deleteDoc(docRef);
+                alert("Event deleted successfully.");
+            }
+
+            navigate(-1);
+        } catch (error) {
+            console.error("Error deleting event:", error);
+            console.error("Error details:", error.message, error.code);
+            alert(`Failed to delete event: ${error.message}`);
+        }
+    };
+
     const handleParticipantStatusChange = (id, newStatus) => {
         setParticipants(participants.map(p =>
             p.id === id ? { ...p, status: newStatus } : p
@@ -150,6 +213,15 @@ export default function EventDetailsPage() {
                 >
                     ← Back to Calendar
                 </button>
+
+                <div className="event-actions-header">
+                    <button
+                        onClick={handleDelete}
+                        className="delete-event-button"
+                    >
+                        🗑️ Delete Event{isSeriesEvent ? ' Series' : ''}
+                    </button>
+                </div>
 
                 <UpdateEventForm
                     formData={formData}
