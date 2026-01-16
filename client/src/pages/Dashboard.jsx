@@ -1,9 +1,9 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-import ParticipantCalendar from "../components/ParticipantCalendar";
-import StaffCalendar from "../components/StaffCalendar";
-import VolunteerCalendar from "../components/VolunteerCalendar";
+import ParticipantCalendar from "../components/calendar/ParticipantCalendar";
+import StaffCalendar from "../components/calendar/StaffCalendar";
+import VolunteerCalendar from "../components/calendar/VolunteerCalendar";
 
 export default function Dashboard() {
     const navigate = useNavigate();

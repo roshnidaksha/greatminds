@@ -4,14 +4,14 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
-import { db } from '../firebase/firebaseConfig';
+import { db } from '../../firebase/firebaseConfig';
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 
-import { useEvents } from '../hooks/useEvents';
-import activityImages from '../data/images.json';
+import { useEvents } from '../../hooks/useEvents';
+import activityImages from '../../data/images.json';
 import './StaffCalendar.css';
 import CalendarEventCard from './CalendarEventCard';
-import CreateEventModal from './CreateEventModal';
+import CreateEventModal from '../modals/CreateEventModal';
 
 const DAYS = [
     { label: 'Mon', value: 1 },

@@ -3,7 +3,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
-import { useEvents } from '../hooks/useEvents';
+import { useEvents } from '../../hooks/useEvents';
 import './ParticipantCalendar.css';
 import CalendarEventCard from './CalendarEventCard';
 
