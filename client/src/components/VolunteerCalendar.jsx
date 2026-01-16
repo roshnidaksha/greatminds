@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import initialEvents from '../data/events.json';
+
+import { useEvents } from '../hooks/useEvents';
 import './VolunteerCalendar.css';
 import CalendarEventCard from './CalendarEventCard';
 
 const VolunteerCalendar = () => {
-    const [events, setEvents] = useState(initialEvents);
+    const { events, loading } = useEvents();
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
 
@@ -36,17 +37,17 @@ const VolunteerCalendar = () => {
     const handleEventClick = (info) => {
         const clickedEvent = info.event;
         const flattened = flattenEvent(clickedEvent);
-        
+
         // Check if volunteer quota is full
         const volunteerInfo = flattened.volunteerInfo;
-        const isVolunteerFull = volunteerInfo && 
+        const isVolunteerFull = volunteerInfo &&
             volunteerInfo.nVolunteersRegistered >= volunteerInfo.nVolunteersRequired;
-    
+
         if (isVolunteerFull) {
             showAlert("Volunteer quota reached. Thank you for your interest!", 'info');
             return;
         }
-        
+
         setSelectedEvent(flattened);
         setIsDetailModalOpen(true);
     };
@@ -85,9 +86,9 @@ const VolunteerCalendar = () => {
 
     const renderEventContent = (eventInfo) => {
         const { imageUrl, isWheelchairAccessible, volunteerInfo } = eventInfo.event.extendedProps;
-        const isVolunteerFull = volunteerInfo && 
+        const isVolunteerFull = volunteerInfo &&
             volunteerInfo.nVolunteersRegistered >= volunteerInfo.nVolunteersRequired;
-        
+
         return (
             <div className={`volunteer-event-wrapper ${isVolunteerFull ? 'volunteer-full' : ''}`}>
                 <CalendarEventCard
@@ -189,15 +190,22 @@ const VolunteerCalendar = () => {
                 </div>
             )}
 
-            <FullCalendar
-                plugins={[dayGridPlugin, interactionPlugin]}
-                initialView="dayGridMonth"
-                events={events}
-                eventClick={handleEventClick}
-                eventContent={renderEventContent}
-                height="80vh"
-                selectable={false}
-            />
+            {loading ? (
+                <div className="loading-container" aria-busy="true" aria-live="polite">
+                    <div className="spinner" />
+                    <p style={{ marginTop: 12, color: '#555' }}>Loading events…</p>
+                </div>
+            ) : (
+                <FullCalendar
+                    plugins={[dayGridPlugin, interactionPlugin]}
+                    initialView="dayGridMonth"
+                    events={events}
+                    eventClick={handleEventClick}
+                    eventContent={renderEventContent}
+                    height="80vh"
+                    selectable={false}
+                />
+            )}
 
             {isDetailModalOpen && selectedEvent && (
                 <div className="modal-overlay" onClick={() => setIsDetailModalOpen(false)}>
@@ -225,17 +233,17 @@ const VolunteerCalendar = () => {
                             {selectedEvent.volunteerInfo && (
                                 <div className="volunteer-info-section">
                                     <h3 style={{ color: '#FF9800', marginTop: '20px', marginBottom: '10px' }}>🤝 Volunteer Information</h3>
-                                    
+
                                     <div className="volunteer-details">
                                         <p><strong>📋 Tasks:</strong> {selectedEvent.volunteerInfo.tasksDescription}</p>
-                                        
+
                                         <p><strong>👥 Staff Present:</strong> {selectedEvent.volunteerInfo.staffPresent.join(', ')}</p>
-                                        
+
                                         <p><strong>📞 Contact Person:</strong> {selectedEvent.contactICName}</p>
                                         <p><strong>📱 Contact Phone:</strong> {selectedEvent.contactICPhone}</p>
-                                        
+
                                         <p><strong>📍 Meeting Point:</strong> {selectedEvent.meetingPoint}</p>
-                                        
+
                                     </div>
                                 </div>
                             )}

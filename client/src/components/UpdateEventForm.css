@@ -1,3 +1,27 @@
+/* Series event warning banner */
+.series-warning {
+    background: #fff4e5;
+    border: 1px solid #ffcc80;
+    color: #7a4f00;
+    padding: 12px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 0.95rem;
+}
+
+/* Highlight fields that affect entire series */
+.series-field .form-input,
+.series-field .form-select {
+    border-color: #ff9800;
+    background: #fffaf2;
+}
+
+.series-field .form-label::after {
+    content: " (applies to series)";
+    color: #b26a00;
+    font-weight: 500;
+}
+
 .details-card {
     background-color: #ffffff;
     border-radius: 16px;

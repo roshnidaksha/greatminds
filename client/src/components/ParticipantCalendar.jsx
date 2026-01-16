@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import initialEvents from '../data/events.json';
+
+import { useEvents } from '../hooks/useEvents';
 import './ParticipantCalendar.css';
 import CalendarEventCard from './CalendarEventCard';
 
 const ParticipantCalendar = () => {
-    const [events, setEvents] = useState(initialEvents);
+    const { events, loading } = useEvents();
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
 
@@ -48,7 +49,7 @@ const ParticipantCalendar = () => {
         // Add meeting preference property
         const eventWithPreference = {
             ...event,
-            meetingPreference: null 
+            meetingPreference: null
         };
         setBasket([...basket, event]);
         setIsDetailModalOpen(false);
@@ -102,18 +103,18 @@ const ParticipantCalendar = () => {
                 [eventId]: preference
             });
             // Update the basket item
-            const updatedBasket = basket.map(item => 
+            const updatedBasket = basket.map(item =>
                 item.id === eventId ? { ...item, meetingPreference: preference } : item
             );
         };
 
-            
+
         const validateCommitments = () => {
             // Check if all items have meeting preference selected
-            const allHavePreference = basket.every(item => 
+            const allHavePreference = basket.every(item =>
                 meetingPreferences[item.id]
             );
-            
+
             if (!allHavePreference) {
                 return {
                     valid: false,
@@ -153,13 +154,13 @@ const ParticipantCalendar = () => {
                             <span>{item.title} - {new Date(item.start).toLocaleDateString()}</span>
                             <button onClick={() => onRemove(item.id)}>❌</button>
                         </div>
-                        
+
                         {/* Meeting Point Selection */}
                         <div className="meeting-selection">
                             <label style={{ fontSize: '12px', fontWeight: '500', display: 'block', marginBottom: '5px' }}>
                                 Meeting Point:
                             </label>
-                            <select 
+                            <select
                                 value={meetingPreferences[item.id] || 'meeting-point'}
                                 onChange={(e) => updateMeetingPreference(item.id, e.target.value)}
                                 style={{
@@ -213,8 +214,8 @@ const ParticipantCalendar = () => {
                                 <h3>{item.title}</h3>
                                 <p>{new Date(item.start).toLocaleDateString()} at {new Date(item.start).toLocaleTimeString()}</p>
                                 <p style={{ fontSize: '0.85em', color: '#666', marginTop: '4px' }}>
-                                    📍 {item.meetingPreference === 'meeting-point' 
-                                        ? item.meetingPoint 
+                                    📍 {item.meetingPreference === 'meeting-point'
+                                        ? item.meetingPoint
                                         : `Direct at ${item.location}`}
                                 </p>
                             </div>
@@ -247,7 +248,7 @@ const ParticipantCalendar = () => {
             {currentView === 'basket' && isBasketOpen && (
                 <BasketView
                     basket={basket}
-                    setBasket={setBasket} 
+                    setBasket={setBasket}
                     onRemove={onRemove}
                     onCheckout={onCheckout}
                 />
@@ -265,15 +266,22 @@ const ParticipantCalendar = () => {
                 </div>
             )}
 
-            <FullCalendar
-                plugins={[dayGridPlugin, interactionPlugin]}
-                initialView="dayGridMonth"
-                events={events}
-                eventClick={handleEventClick}
-                eventContent={renderEventContent}
-                height="80vh"
-                selectable={false}
-            />
+            {loading ? (
+                <div className="loading-container" aria-busy="true" aria-live="polite">
+                    <div className="spinner" />
+                    <p style={{ marginTop: 12, color: '#555' }}>Loading events…</p>
+                </div>
+            ) : (
+                <FullCalendar
+                    plugins={[dayGridPlugin, interactionPlugin]}
+                    initialView="dayGridMonth"
+                    events={events}
+                    eventClick={handleEventClick}
+                    eventContent={renderEventContent}
+                    height="80vh"
+                    selectable={false}
+                />
+            )}
 
             {isDetailModalOpen && (
                 <div className="modal-overlay" onClick={() => setIsDetailModalOpen(false)}>

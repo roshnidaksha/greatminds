@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+
+import { db } from '../firebase/firebaseConfig';
+import { doc, updateDoc, writeBatch, collection, query, where, getDocs, Timestamp } from "firebase/firestore";
+
 import UpdateEventForm from "../components/UpdateEventForm";
 import { useEventRegistrations } from "../hooks/useEventRegistrations";
 import { useConfirmation } from "../hooks/useConfirmation";
@@ -11,6 +15,7 @@ export default function EventDetailsPage() {
     const navigate = useNavigate();
     const location = useLocation();
     const { event, onUpdate } = location.state || {};
+    const isSeriesEvent = event?.isSeries ?? event?.extendedProps?.isSeries;
 
     const [formData, setFormData] = useState({
         title: event?.title || "",
@@ -25,6 +30,7 @@ export default function EventDetailsPage() {
         location: event?.extendedProps?.location || "",
         meetingPoint: event?.extendedProps?.meetingPoint || "",
         description: event?.extendedProps?.description || "",
+        minDaysRequired: event?.extendedProps?.minDaysRequired ?? 1,
         nVolunteersRequired: event?.extendedProps?.volunteerInfo?.nVolunteersRequired || 0,
         tasksDescription: event?.extendedProps?.volunteerInfo?.tasksDescription || ""
     });
@@ -33,36 +39,64 @@ export default function EventDetailsPage() {
     const { confirmationMessage, confirmationsSent, sendConfirmations } = useConfirmation(participants, volunteers);
     const [attendanceMessage, setAttendanceMessage] = useState("");
 
-    const handleSave = () => {
-        const updatedEvent = {
-            ...event,
+    const handleSave = async () => {
+        const isSeriesEvent = event?.isSeries ?? event?.extendedProps?.isSeries;
+        const seriesId = event?.seriesId ?? event?.extendedProps?.seriesId;
+        const costValue = formData.cost === '' ? null : parseFloat(formData.cost);
+        const updatedFields = {
             title: formData.title,
-            start: `${formData.date}T${formData.startTime}:00`,
-            end: `${formData.date}T${formData.endTime}:00`,
-            extendedProps: {
-                ...event.extendedProps,
-                isWheelchairAccessible: formData.isWheelchairAccessible,
-                imageUrl: formData.imageUrl,
-                contactICName: formData.contactICName,
-                contactICPhone: formData.contactICPhone,
-                cost: formData.cost === '' ? null : parseFloat(formData.cost),
-                location: formData.location,
-                meetingPoint: formData.meetingPoint,
-                description: formData.description,
-                volunteerInfo: {
-                    ...event.extendedProps.volunteerInfo,
-                    tasksDescription: formData.tasksDescription,
-                    nVolunteersRequired: formData.nVolunteersRequired
-                }
-            }
+            start: Timestamp.fromDate(new Date(`${formData.date}T${formData.startTime}:00`)),
+            end: Timestamp.fromDate(new Date(`${formData.date}T${formData.endTime}:00`)),
+            'extendedProps.isWheelchairAccessible': formData.isWheelchairAccessible,
+            'extendedProps.imageUrl': formData.imageUrl,
+            'extendedProps.contactICName': formData.contactICName,
+            'extendedProps.contactICPhone': formData.contactICPhone,
+            'extendedProps.cost': Number.isFinite(costValue) ? costValue : null,
+            'extendedProps.location': formData.location,
+            'extendedProps.meetingPoint': formData.meetingPoint,
+            'extendedProps.description': formData.description,
+            'extendedProps.minDaysRequired': Number(formData.minDaysRequired) || 1,
+            'extendedProps.volunteerInfo.tasksDescription': formData.tasksDescription,
+            'extendedProps.volunteerInfo.nVolunteersRequired': formData.nVolunteersRequired,
         };
 
-        if (onUpdate) {
-            onUpdate(updatedEvent);
+        try {
+            if (isSeriesEvent && seriesId) {
+                const batch = writeBatch(db);
+                const q = query(
+                    collection(db, "events"),
+                    where("seriesId", "==", seriesId)
+                );
+                const querySnapshot = await getDocs(q);
+
+                const seriesWideFields = {
+                    title: formData.title,
+                    'extendedProps.imageUrl': formData.imageUrl,
+                    'extendedProps.contactICName': formData.contactICName,
+                    'extendedProps.contactICPhone': formData.contactICPhone,
+                    'extendedProps.minDaysRequired': Number(formData.minDaysRequired) || 1,
+                };
+
+                querySnapshot.forEach((document) => {
+                    const docRef = doc(db, "events", document.id);
+                    if (document.id === event.id) {
+                        batch.update(docRef, updatedFields);
+                    } else {
+                        batch.update(docRef, seriesWideFields);
+                    }
+                });
+
+                await batch.commit();
+            } else {
+                const docRef = doc(db, "events", event.id);
+                await updateDoc(docRef, updatedFields);
+            }
+        } catch (error) {
+            console.error("Error updating event: ", error);
+            alert("Failed to update event. Please try again.");
         }
 
-        alert("Event updated successfully!");
-        navigate(-1);
+        navigate(-1)
     };
 
     const handleParticipantStatusChange = (id, newStatus) => {
@@ -121,6 +155,7 @@ export default function EventDetailsPage() {
                     formData={formData}
                     setFormData={setFormData}
                     handleSave={handleSave}
+                    isSeries={Boolean(isSeriesEvent)}
                 />
 
                 {/* Participants Section */}

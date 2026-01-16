@@ -3,7 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import initialEvents from '../data/events.json';
+
+import { db } from '../firebase/firebaseConfig';
+import { collection, addDoc, Timestamp } from "firebase/firestore";
+
+import { useEvents } from '../hooks/useEvents';
 import activityImages from '../data/images.json';
 import './StaffCalendar.css';
 import CalendarEventCard from './CalendarEventCard';
@@ -21,7 +25,7 @@ const DAYS = [
 
 const StaffCalendar = () => {
     const navigate = useNavigate();
-    const [events, setEvents] = useState(initialEvents);
+    const { events, loading } = useEvents();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [formData, setFormData] = useState({
@@ -55,9 +59,11 @@ const StaffCalendar = () => {
             title: clickInfo.event.title,
             start: clickInfo.event.startStr,
             end: clickInfo.event.endStr,
+            isSeries: clickInfo.event.extendedProps?.isSeries,
+            seriesId: clickInfo.event.extendedProps?.seriesId,
             extendedProps: clickInfo.event.extendedProps
         };
-        
+
         navigate('/event-details', {
             state: { event: eventData }
         });
@@ -71,37 +77,41 @@ const StaffCalendar = () => {
         setFormData({ ...formData, selectedDays: newDays });
     }
 
-    const handleSave = () => {
+    const handleSave = async () => {
         const isMultiDay = formData.selectedDays.length > 1;
         const costValue = formData.cost === '' ? null : Number.parseFloat(formData.cost);
         const seriesId = isMultiDay ? `series_${Date.now()}` : null;
         const newEventsBatch = [];
 
-        if (!isMultiDay) {
-            newEventsBatch.push({
-                id: `event_${Math.random().toString(36)}`,
-                isSeries: false,
-                seriesId: null,
-                title: formData.title,
-                start: `${formData.startDate}T${formData.startTime}:00`,
-                end: `${formData.startDate}T${formData.endTime}:00`,
-                extendedProps: {
-                    isWheelchairAccessible: formData.isWheelchairAccessible,
-                    imageUrl: formData.selectedImage,
-                    minDaysRequired: 1,
-                    contactICName: formData.contactICName,
-                    contactICPhone: formData.contactICPhone,
-                    cost: Number.isFinite(costValue) ? costValue : null,
-                    location: formData.location,
-                    meetingPoint: formData.meetingPoint,
-                    description: formData.description,
-                    volunteerInfo: {
-                        tasksDescription: formData.tasksDescription,
-                        nVolunteersRequired: formData.nVolunteersRequired,
-                        nVolunteersRegistered: 0
-                    }
+        const createEventObject = (dateStr, isSeries, sId, minDays) => ({
+            isSeries: isSeries,
+            seriesId: sId,
+            title: formData.title,
+            start: Timestamp.fromDate(new Date(`${dateStr}T${formData.startTime}:00`)),
+            end: Timestamp.fromDate(new Date(`${dateStr}T${formData.endTime}:00`)),
+            extendedProps: {
+                isWheelchairAccessible: formData.isWheelchairAccessible,
+                imageUrl: formData.selectedImage,
+                minDaysRequired: minDays,
+                contactICName: formData.contactICName,
+                contactICPhone: formData.contactICPhone,
+                cost: Number.isFinite(costValue) ? costValue : null,
+                location: formData.location,
+                meetingPoint: formData.meetingPoint,
+                description: formData.description,
+                volunteerInfo: {
+                    tasksDescription: formData.tasksDescription,
+                    nVolunteersRequired: Number(formData.nVolunteersRequired) || 0,
+                    nVolunteersRegistered: 0
                 }
-            });
+            },
+            createdAt: Timestamp.now()
+        })
+
+        if (!isMultiDay) {
+            newEventsBatch.push(
+                createEventObject(formData.startDate, false, null, 1)
+            );
         } else {
             formData.selectedDays.forEach(dayOffset => {
                 const baseDate = new Date(formData.startDate);
@@ -111,58 +121,50 @@ const StaffCalendar = () => {
                 eventDate.setDate(baseDate.getDate() + distance);
                 const dateStr = eventDate.toISOString().split('T')[0];
 
-                newEventsBatch.push({
-                    id: `event_${Math.random().toString(36)}`,
-                    isSeries: true,
-                    seriesId: seriesId,
-                    title: formData.title,
-                    start: `${dateStr}T${formData.startTime}:00`,
-                    end: `${dateStr}T${formData.endTime}:00`,
-                    extendedProps: {
-                        isWheelchairAccessible: formData.isWheelchairAccessible,
-                        imageUrl: formData.selectedImage,
-                        minDaysRequired: formData.commitment,
-                        contactICName: formData.contactICName,
-                        contactICPhone: formData.contactICPhone,
-                        cost: Number.isFinite(costValue) ? costValue : null,
-                        location: formData.location,
-                        meetingPoint: formData.meetingPoint,
-                        description: formData.description,
-                        volunteerInfo: {
-                            tasksDescription: formData.tasksDescription,
-                            nVolunteersRequired: formData.nVolunteersRequired,
-                            nVolunteersRegistered: 0
-                        }
-                    }
-                });
+                newEventsBatch.push(
+                    createEventObject(dateStr, true, seriesId, formData.commitment)
+                )
             });
         }
 
-        setEvents([...events, ...newEventsBatch]);
-        setIsModalOpen(false);
-        setFormData({
-            title: '',
-            startDate: '',
-            startTime: '09:00',
-            endTime: '10:00',
-            isWheelchairAccessible: false,
-            selectedImage: activityImages[0].url,
-            selectedDays: [],
-            commitment: 1,
-            contactIC: '',
-            cost: '',
-            location: '',
-            description: ''
-        });
+        try {
+            const eventsRef = collection(db, "events");
+            const uploadPromises = newEventsBatch.map(event => addDoc(eventsRef, event));
+
+            await Promise.all(uploadPromises);
+
+            setIsModalOpen(false);
+            setFormData({
+                title: '',
+                startDate: '',
+                startTime: '09:00',
+                endTime: '10:00',
+                isWheelchairAccessible: false,
+                selectedImage: activityImages[0].url,
+                selectedDays: [],
+                commitment: 1,
+                contactICName: '',
+                contactICPhone: '',
+                cost: '',
+                location: '',
+                meetingPoint: '',
+                description: '',
+                tasksDescription: '',
+                nVolunteersRequired: 0
+            });
+        } catch (error) {
+            console.error("Error adding events to Firebase: ", error);
+            alert("Failed to save event. Please check your connection.");
+        }
     };
 
     const renderEventContent = (eventInfo) => {
         const { imageUrl, isWheelchairAccessible } = eventInfo.event.extendedProps;
         return (
             <CalendarEventCard
-              title={eventInfo.event.title}
-              imageUrl={imageUrl}
-              isWheelchairAccessible={isWheelchairAccessible}
+                title={eventInfo.event.title}
+                imageUrl={imageUrl}
+                isWheelchairAccessible={isWheelchairAccessible}
             />
         );
     };
@@ -171,16 +173,23 @@ const StaffCalendar = () => {
         <div style={{ padding: '20px' }}>
             <h2>Event Management Dashboard</h2>
 
-            <FullCalendar
-                plugins={[dayGridPlugin, interactionPlugin]}
-                initialView="dayGridMonth"
-                events={events}
-                dateClick={handleDateClick}
-                eventClick={handleEventClick}
-                eventContent={renderEventContent}
-                height="80vh"
-                eventDisplay="block"
-            />
+            {loading ? (
+                <div className="loading-container" aria-busy="true" aria-live="polite">
+                    <div className="spinner" />
+                    <p style={{ marginTop: 12, color: '#555' }}>Loading events…</p>
+                </div>
+            ) : (
+                <FullCalendar
+                    plugins={[dayGridPlugin, interactionPlugin]}
+                    initialView="dayGridMonth"
+                    events={events}
+                    dateClick={handleDateClick}
+                    eventClick={handleEventClick}
+                    eventContent={renderEventContent}
+                    height="80vh"
+                    eventDisplay="block"
+                />
+            )}
 
             {isModalOpen && (
                 <CreateEventModal

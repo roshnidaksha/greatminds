@@ -1,13 +1,19 @@
 import activityImages from "../data/images.json";
 import "./UpdateEventForm.css";
 
-export default function UpdateEventForm({ formData, setFormData, handleSave }) {
+export default function UpdateEventForm({ formData, setFormData, handleSave, isSeries }) {
     return (
         <div className="details-card">
             <h2>Edit Event Details</h2>
 
+            {isSeries && (
+                <div className="series-warning" role="alert">
+                    ⚠️ This is a series event. Changes to highlighted fields will apply to all events in the series.
+                </div>
+            )}
+
             <div className="form-grid">
-                <div>
+                <div className={isSeries ? "series-field" : undefined}>
                     <label className="form-label">
                         Event Title
                     </label>
@@ -19,19 +25,7 @@ export default function UpdateEventForm({ formData, setFormData, handleSave }) {
                     />
                 </div>
 
-                <div>
-                    <label className="form-label">
-                        Description
-                    </label>
-                    <input
-                        type="text"
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        className="form-input"
-                    />
-                </div>
-
-                <div>
+                <div className={isSeries ? "series-field" : undefined}>
                     <label className="form-label">
                         Activity Image
                     </label>
@@ -46,6 +40,18 @@ export default function UpdateEventForm({ formData, setFormData, handleSave }) {
                             </option>
                         ))}
                     </select>
+                </div>
+
+                <div>
+                    <label className="form-label">
+                        Description
+                    </label>
+                    <input
+                        type="text"
+                        value={formData.description}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        className="form-input"
+                    />
                 </div>
 
                 <div className="form-grid-col-3">
@@ -84,6 +90,21 @@ export default function UpdateEventForm({ formData, setFormData, handleSave }) {
                     </div>
                 </div>
 
+                {isSeries && (
+                    <div className={isSeries ? "series-field" : undefined}>
+                        <label className="form-label">
+                            Minimum Days Required (series)
+                        </label>
+                        <input
+                            type="number"
+                            min={1}
+                            value={formData.minDaysRequired}
+                            onChange={(e) => setFormData({ ...formData, minDaysRequired: e.target.value })}
+                            className="form-input"
+                        />
+                    </div>
+                )}
+
                 <div className="form-grid-col-2">
                     <div>
                         <label className="form-label">
@@ -110,7 +131,7 @@ export default function UpdateEventForm({ formData, setFormData, handleSave }) {
                 </div>
 
                 <div className="form-grid-col-2">
-                    <div>
+                    <div className={isSeries ? "series-field" : undefined}>
                         <label className="form-label">
                             Contact IC Name
                         </label>
@@ -121,7 +142,7 @@ export default function UpdateEventForm({ formData, setFormData, handleSave }) {
                             className="form-input"
                         />
                     </div>
-                    <div>
+                    <div className={isSeries ? "series-field" : undefined}>
                         <label className="form-label">
                             Contact IC Phone
                         </label>
@@ -154,8 +175,8 @@ export default function UpdateEventForm({ formData, setFormData, handleSave }) {
                             </label>
                             <input
                                 type="text"
-                                value={formData.taskDescription}
-                                onChange={(e) => setFormData({ ...formData, taskDescription: e.target.value })}
+                                value={formData.tasksDescription}
+                                onChange={(e) => setFormData({ ...formData, tasksDescription: e.target.value })}
                                 className="form-input"
                             />
                         </div>
