@@ -1,7 +1,8 @@
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -28,32 +29,42 @@
 .modal-header {
     position: sticky;
     top: 0;
-    background: #fff;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 4px 4px 8px 4px;
-    border-bottom: 1px solid #eee;
+    padding: 16px;
+    border-bottom: 2px solid rgba(59, 130, 246, 0.2);
     z-index: 1;
+    border-radius: 14px 14px 0 0;
 }
 
 .modal-header h3 {
     margin: 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .modal-close {
     background: transparent;
     border: none;
-    color: #0b3c91;
-    font-size: 20px;
+    color: #3b82f6;
+    font-size: 28px;
     line-height: 1;
     cursor: pointer;
-    padding: 4px 6px;
+    padding: 4px 8px;
     border-radius: 8px;
+    transition: all 0.2s ease;
+    font-weight: 700;
 }
 
 .modal-close:hover {
-    background: #f2f6ff;
+    background: rgba(59, 130, 246, 0.1);
+    transform: rotate(90deg);
 }
 
 .modal-body {
@@ -68,28 +79,29 @@
 /* Labels and inputs */
 .modal-body label:not(.checkbox-label) {
     display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: #0b3c91;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e40af;
     margin-bottom: 6px;
 }
 
 .modal-body input,
 .modal-body textarea {
     padding: 10px 12px;
-    border: 1px solid #ccc;
+    border: 2px solid #e2e8f0;
     border-radius: 10px;
     font-size: 14px;
     outline: none;
     width: 100%;
     box-sizing: border-box;
     background: #fff;
+    transition: all 0.2s ease;
 }
 
 .modal-body input:focus,
 .modal-body textarea:focus {
-    border-color: #19d3da;
-    box-shadow: 0 0 0 2px rgba(25, 211, 218, 0.25);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .modal-body textarea {
@@ -108,21 +120,21 @@
 .checkbox-label {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-size: 13px;
+    gap: 8px;
+    font-size: 14px;
     font-weight: 600;
-    color: #0b3c91;
+    color: #1e40af;
     line-height: 1;
     margin: 2px 0;
 }
 
 .checkbox-label input[type="checkbox"] {
     margin: 0;
-    width: 16px;
+    width: 18px;
+    height: 18px;
     vertical-align: middle;
-    transform: scale(0.85);
-    transform-origin: center;
-    accent-color: #0b3c91;
+    accent-color: #3b82f6;
+    cursor: pointer;
 }
 
 /* ========== Image picker =========== */
@@ -138,15 +150,17 @@
     flex-direction: column;
     align-items: center;
     gap: 6px;
-    padding: 8px;
-    border: 1px solid #e7eef5;
-    border-radius: 10px;
+    padding: 10px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .image-tile.active {
-    border-color: #19d3da;
-    box-shadow: 0 0 0 2px rgba(25, 211, 218, 0.25);
+    border-color: #3b82f6;
+    background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .image-tile img {
@@ -158,12 +172,15 @@
 
 .image-tile span {
     font-size: 12px;
-    color: #0b3c91;
-    font-weight: 600;
+    color: #1e40af;
+    font-weight: 700;
 }
 
 .image-tile:hover {
-    background-color: #f0f0f0;
+    border-color: #3b82f6;
+    background-color: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
 }
 
 /* ========== Day selector ========== */
@@ -175,20 +192,27 @@
 }
 
 .weekday-chips button {
-    padding: 6px 10px;
-    border: 1px solid #e7eef5;
+    padding: 8px 14px;
+    border: 2px solid #e2e8f0;
     border-radius: 20px;
     background: #fff;
     cursor: pointer;
-    font-size: 12px;
-    color: #0b3c91;
-    font-weight: 600;
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 700;
+    transition: all 0.2s ease;
 }
 
 .weekday-chips button.active {
-    background: #e8fbff;
-    color: #0b3c91;
-    border-color: #19d3da;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.weekday-chips button:hover:not(.active) {
+    border-color: #3b82f6;
+    background: #f1f5f9;
 }
 
 .commitment-input {
@@ -214,23 +238,37 @@
 }
 
 .save-btn {
-    padding: 10px 14px;
+    padding: 12px 24px;
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    font-weight: 600;
-    background: linear-gradient(90deg, #19d3da, #0b3c91);
+    font-weight: 700;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
     color: #fff;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
 .cancel-btn {
-    padding: 10px 14px;
-    border: none;
+    padding: 12px 24px;
+    border: 2px solid #e2e8f0;
     border-radius: 12px;
     cursor: pointer;
-    font-weight: 600;
-    background: #f3f3f3;
-    color: #333;
+    font-weight: 700;
+    background: white;
+    color: #64748b;
+    transition: all 0.3s ease;
+}
+
+.cancel-btn:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+    background: #f8fafc;
 }
 
 @keyframes modalFadeIn {
