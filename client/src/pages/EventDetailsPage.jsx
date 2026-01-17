@@ -9,7 +9,7 @@ import { useEventRegistrations } from "../hooks/useEventRegistrations";
 import { useConfirmation } from "../hooks/useConfirmation";
 import { RosterTable, exportToPDF } from "../components/RosterTable.jsx";
 import AttendanceTracker from "../components/AttendanceTracker";
-import { showAlert } from '../utils/alerts';
+import { showAlert } from '../utils/utils.js';
 import "./EventDetailsPage.css";
 
 export default function EventDetailsPage() {

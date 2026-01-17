@@ -8,9 +8,10 @@ import { collection, addDoc, Timestamp, query, where, getDocs } from "firebase/f
 
 import { useAuth } from "../../context/AuthContext";
 import { useEvents } from '../../hooks/useEvents';
+import { useRegistrationsByUser } from '../../hooks/useEventRegistrations';
 import { validateEventSelection } from '../../utils/conflictChecker';
 import './ParticipantCalendar.css';
-import { showAlert } from '../../utils/alerts';
+import { showAlert, flattenEvent } from '../../utils/utils';
 import CalendarEventCard from './CalendarEventCard';
 
 const ParticipantCalendar = () => {
@@ -32,31 +33,7 @@ const ParticipantCalendar = () => {
     const [voiceCommand, setVoiceCommand] = useState('');
 
     // User registrations
-    const [userRegistrations, setUserRegistrations] = useState([]);
-
-    // Fetch user registrations from Firestore
-    useEffect(() => {
-        const fetchRegistrations = async () => {
-            if (!user?.uid) return;
-            
-            try {
-                const q = query(
-                    collection(db, "registrations"),
-                    where("userId", "==", user.uid)
-                );
-                const querySnapshot = await getDocs(q);
-                const registrations = [];
-                querySnapshot.forEach((doc) => {
-                    registrations.push({ id: doc.id, ...doc.data() });
-                });
-                setUserRegistrations(registrations);
-            } catch (error) {
-                console.error("Error fetching registrations:", error);
-            }
-        };
-
-        fetchRegistrations();
-    }, [user?.uid]);
+    const { registrations: userRegistrations, setRegistrations: setUserRegistrations } = useRegistrationsByUser(user?.uid);
 
     // Get registration status for an event
     const getRegistrationStatus = (eventId) => {
@@ -161,18 +138,6 @@ const ParticipantCalendar = () => {
 
         // Default
         speak("Sorry, I didn't understand that command. Say help for available commands.");
-    };
-
-    const flattenEvent = (event) => {
-        if (!event) return null;
-        const ext = event.extendedProps || {};
-        return {
-            ...ext,
-            id: event.id,
-            title: event.title,
-            start: event.start ? new Date(event.start) : null,
-            end: event.end ? new Date(event.end) : null,
-        };
     };
 
     const handleEventClick = (info) => {

@@ -8,9 +8,10 @@ import { collection, addDoc, Timestamp, query, where, getDocs } from "firebase/f
 
 import { useAuth } from "../../context/AuthContext";
 import { useEvents } from '../../hooks/useEvents';
+import { useRegistrationsByUser } from '../../hooks/useEventRegistrations';
 import { validateEventSelection } from '../../utils/conflictChecker';
 import './VolunteerCalendar.css';
-import { showAlert } from '../../utils/alerts';
+import { showAlert, flattenEvent } from '../../utils/utils';
 import CalendarEventCard from './CalendarEventCard';
 
 const VolunteerCalendar = () => {
@@ -24,46 +25,11 @@ const VolunteerCalendar = () => {
     const [currentView, setCurrentView] = useState('basket');
     const [alert, setAlert] = useState(null);
 
-    const [userRegistrations, setUserRegistrations] = useState([]);
-
-    useEffect(() => {
-        const fetchRegistrations = async () => {
-            if (!user?.uid) return;
-            
-            try {
-                const q = query(
-                    collection(db, "volunteerRegistrations"),
-                    where("userId", "==", user.uid)
-                );
-                const querySnapshot = await getDocs(q);
-                const registrations = [];
-                querySnapshot.forEach((doc) => {
-                    registrations.push({ id: doc.id, ...doc.data() });
-                });
-                setUserRegistrations(registrations);
-            } catch (error) {
-                console.error("Error fetching volunteer registrations:", error);
-            }
-        };
-
-        fetchRegistrations();
-    }, [user?.uid]);
+    const { registrations: userRegistrations, setRegistrations: setUserRegistrations } = useRegistrationsByUser(user?.uid);
 
     const getRegistrationStatus = (eventId) => {
         const registration = userRegistrations.find(reg => reg.eventId === eventId);
         return registration?.status || null;
-    };
-
-    const flattenEvent = (event) => {
-        if (!event) return null;
-        const ext = event.extendedProps || {};
-        return {
-            ...ext,
-            id: event.id,
-            title: event.title,
-            start: event.start ? new Date(event.start) : null,
-            end: event.end ? new Date(event.end) : null,
-        };
     };
 
     const handleEventClick = (info) => {
