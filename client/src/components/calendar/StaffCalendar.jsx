@@ -170,7 +170,10 @@ const StaffCalendar = () => {
 
     return (
         <div style={{ padding: '20px' }}>
-            <h2>Event Management Dashboard</h2>
+            <header className="calendar-header-text">
+                <h1 className="calendar-title">Event Management Dashboard</h1>
+                <p className="calendar-subtitle">Click on a picture to edit the event details</p>
+            </header>
 
             {loading ? (
                 <div className="loading-container" aria-busy="true" aria-live="polite">

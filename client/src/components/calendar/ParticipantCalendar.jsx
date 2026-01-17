@@ -310,46 +310,60 @@ const ParticipantCalendar = () => {
                     {alert.message}
                 </div>
             )}
-            <header className="participant-header">
-                <h1>Available Activities</h1>
-                <p>Click on a picture to sign up!</p>
-
-                <div className="wheelchair-filter">
-                    <label className="toggle-label">
-                        <input
-                            type="checkbox"
-                            checked={showOnlyWheelchairAccessible}
-                            onChange={(e) => setShowOnlyWheelchairAccessible(e.target.checked)}
-                            className="toggle-checkbox"
-                        />
-                        <span className="toggle-text">
-                            Show only wheelchair accessible events ♿
-                        </span>
-                    </label>
-                </div>
-
-                {/* Voice Control Button */}
-                <div className="voice-control-section">
-                    <button
-                        className={`voice-button ${isListening ? 'listening' : ''}`}
-                        onClick={startVoiceRecognition}
-                        disabled={isListening}
-                    >
-                        {isListening ? '🎤 Listening...' : '🎤 Voice Command'}
-                    </button>
-                    {voiceCommand && (
-                        <div className="voice-feedback">
-                            You said: "{voiceCommand}"
-                        </div>
-                    )}
-                    <button
-                        className="help-button"
-                        onClick={() => speak("Say: show wheelchair events, show basket, confirm registration, or read events")}
-                    >
-                        ℹ️ Voice Help
-                    </button>
-                </div>
+            <header className="calendar-header-text">
+                <h1 className="calendar-title">Available Activities</h1>
+                <p className="calendar-subtitle">Click on a picture to sign up for the event!</p>
             </header>
+
+            {/* Control Panel */}
+            <div className="control-panel">
+                <div className="control-card wheelchair-control">
+                    <div className="control-icon">♿</div>
+                    <div className="control-content">
+                        <h3 className="control-label">Wheelchair Filter</h3>
+                        <label className="modern-toggle">
+                            <input
+                                type="checkbox"
+                                checked={showOnlyWheelchairAccessible}
+                                onChange={(e) => setShowOnlyWheelchairAccessible(e.target.checked)}
+                                className="toggle-input"
+                            />
+                            <span className="toggle-slider"></span>
+                            <span className="toggle-status">
+                                {showOnlyWheelchairAccessible ? 'Accessible Only' : 'All Events'}
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div className="control-card voice-control">
+                    <div className="control-icon">🎤</div>
+                    <div className="control-content">
+                        <h3 className="control-label">Voice Commands</h3>
+                        <div className="voice-buttons">
+                            <button
+                                className={`modern-voice-button ${isListening ? 'listening' : ''}`}
+                                onClick={startVoiceRecognition}
+                                disabled={isListening}
+                            >
+                                {isListening ? 'Listening...' : 'Start Voice'}
+                            </button>
+                            <button
+                                className="help-button-modern"
+                                onClick={() => speak("Say: show wheelchair events, show basket, confirm registration, or read events")}
+                                title="Voice Help"
+                            >
+                                <span className="help-icon">?</span>
+                            </button>
+                        </div>
+                        {voiceCommand && (
+                            <div className="voice-feedback-modern">
+                                "{voiceCommand}"
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
 
             {currentView === 'basket' && isBasketOpen && (
                 <BasketView

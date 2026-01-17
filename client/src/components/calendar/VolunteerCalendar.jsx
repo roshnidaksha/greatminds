@@ -207,9 +207,13 @@ const VolunteerCalendar = () => {
                     {alert.message}
                 </div>
             )}
+            <header className="calendar-header-text">
+                <h1 className="calendar-title">Available Activities</h1>
+                <p className="calendar-subtitle">Click on a picture to sign up for the event!</p>
+            </header>
             <header className="volunteer-header">
-                <h1>Volunteer Opportunities</h1>
-                <p>Click on an activity to volunteer!</p>
+                <h1 style={{ display: 'none' }}>Volunteer Opportunities</h1>
+                <p style={{ display: 'none' }}>Click on an activity to volunteer!</p>
             </header>
 
             {currentView === 'basket' && isBasketOpen && (

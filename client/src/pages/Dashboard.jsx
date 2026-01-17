@@ -6,6 +6,7 @@ import { auth } from "../firebase/firebaseConfig";
 import ParticipantCalendar from "../components/calendar/ParticipantCalendar";
 import StaffCalendar from "../components/calendar/StaffCalendar";
 import VolunteerCalendar from "../components/calendar/VolunteerCalendar";
+import "./Dashboard.css";
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -33,27 +34,17 @@ export default function Dashboard() {
     };
 
     return (
-        <div style={{ padding: "120px 32px 32px 32px" }}>
-            <div
-                style={{
-                    background: "white",
-                    padding: "20px 28px",
-                    borderRadius: "16px",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-                    marginBottom: "24px"
-                }}
-            >
-                <div>
-                    <h2 style={{ margin: 0 }}>Welcome, {user.email} ({role})</h2>
-                    <p style={{ margin: 0, color: "#555" }}>
+        <div className="dashboard-container">
+            <div className="dashboard-header">
+                <div className="dashboard-header-info">
+                    <h2>Welcome, {user.email}!</h2>
+                    <p>
                         Logged in as <strong>{role}</strong>
                     </p>
                 </div>
 
                 <button
+                    className="logout-btn"
                     onClick={async () => {
                         try {
                             await signOut(auth);
@@ -62,18 +53,14 @@ export default function Dashboard() {
                             console.error("Logout failed", e);
                         }
                     }}
-                    style={{
-                        border: "none",
-                        borderRadius: "12px",
-                        padding: "10px 16px",
-                        cursor: "pointer"
-                    }}
                 >
-                    Log out
+                    🚪 Log out
                 </button>
             </div>
             
-            {renderDashboardContent()}
+            <div className="dashboard-content">
+                {renderDashboardContent()}
+            </div>
         </div>
     );
 }
