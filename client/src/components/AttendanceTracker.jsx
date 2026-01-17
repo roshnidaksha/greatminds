@@ -1,6 +1,8 @@
+import { exportToPDF } from "./RosterTable.jsx";
 import "./AttendanceTracker.css";
 
 export default function AttendanceTracker({
+    eventTitle,
     confirmedParticipants,
     confirmedVolunteers,
     handleParticipantAttendanceChange,
@@ -14,6 +16,12 @@ export default function AttendanceTracker({
             <p>
                 Record attendance for confirmed participants and volunteers
             </p>
+            <button
+                className="back-button"
+                onClick={() => exportToPDF(eventTitle, confirmedParticipants, confirmedVolunteers)}
+            >
+                📄 Export Attendance PDF
+            </button>
 
             {confirmedParticipants.length > 0 && (
                 <>
