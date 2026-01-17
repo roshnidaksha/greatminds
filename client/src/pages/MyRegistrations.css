@@ -2,124 +2,214 @@
     padding: 120px 32px 32px 32px;
     max-width: 1400px;
     margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+}
+
+.my-registrations-container::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: -1;
 }
 
 .registrations-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 50px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 }
 
 .registrations-header h1 {
-    font-size: 2.5rem;
-    color: #0b3c91;
-    margin-bottom: 10px;
+    font-size: 40px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
 }
 
 .registrations-header p {
-    color: #666;
-    font-size: 1.1rem;
+    color: #475569;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
 }
 
 .empty-state {
     text-align: center;
-    padding: 60px 20px;
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 80px 40px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 }
 
 .empty-state h2 {
-    color: #0b3c91;
-    margin-bottom: 10px;
+    background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 15px;
+    font-size: 28px;
+    font-weight: 800;
 }
 
 .empty-state p {
-    color: #666;
+    color: #64748b;
+    font-size: 16px;
+    font-weight: 500;
 }
 
 .registrations-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 24px;
+    gap: 28px;
 }
 
 .registration-card {
-    background: white;
-    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .registration-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 48px rgba(59, 130, 246, 0.25);
 }
 
 .registration-card-header {
     position: relative;
-    height: 180px;
+    height: 200px;
     overflow: hidden;
+}
+
+.registration-card-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
 }
 
 .registration-card-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.registration-card:hover .registration-card-image {
+    transform: scale(1.1);
 }
 
 .wheelchair-badge {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 12px;
+    right: 12px;
     background: rgba(255, 255, 255, 0.95);
-    padding: 6px 12px;
+    backdrop-filter: blur(10px);
+    padding: 8px 14px;
     border-radius: 20px;
-    font-size: 18px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1;
 }
 
 .registration-card-body {
-    padding: 20px;
+    padding: 25px;
 }
 
 .registration-card-body h3 {
-    margin: 0 0 16px 0;
-    color: #0b3c91;
-    font-size: 1.3rem;
+    margin: 0 0 18px 0;
+    background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
 }
 
 .registration-details {
-    margin-bottom: 16px;
+    margin-bottom: 18px;
 }
 
 .detail-row {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 0;
-    font-size: 0.95rem;
-    color: #333;
+    gap: 12px;
+    padding: 10px 0;
+    font-size: 15px;
+    color: #334155;
+    font-weight: 600;
 }
 
 .detail-icon {
-    font-size: 1.2rem;
-    width: 24px;
+    font-size: 20px;
+    width: 28px;
     display: inline-block;
 }
 
 .registration-status {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 16px 0;
-    border-top: 1px solid #eee;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 12px;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 0;
+    border-top: 2px solid #e0e7ff;
+    border-bottom: 2px solid #e0e7ff;
+    margin-bottom: 16px;
 }
 
 .registration-status strong {
-    color: #0b3c91;
+    background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.status-badge {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.status-badge.status-registered {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: #92400e;
+    border: 1px solid #fcd34d;
+}
+
+.status-badge.status-confirmed {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+}
+
+.status-badge.status-waitlisted {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #1e40af;
+    border: 1px solid #93c5fd;
 }
 
 .registration-footer {
@@ -127,16 +217,34 @@
 }
 
 .registration-footer small {
-    color: #999;
-    font-size: 0.85rem;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
 }
 
 @media (max-width: 768px) {
+    .my-registrations-container {
+        padding: 100px 20px 32px 20px;
+    }
+
     .registrations-grid {
         grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .registrations-header {
+        padding: 30px 20px;
     }
 
     .registrations-header h1 {
-        font-size: 2rem;
+        font-size: 32px;
+    }
+
+    .registrations-header p {
+        font-size: 16px;
+    }
+
+    .registration-card-body h3 {
+        font-size: 20px;
     }
 }

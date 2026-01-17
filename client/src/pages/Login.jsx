@@ -4,7 +4,7 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { getDoc, doc } from "firebase/firestore";
 import { auth, db } from "../firebase/firebaseConfig";
-import "../index.css";
+import "./Login.css";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -40,22 +40,17 @@ export default function Login() {
                 <h1 className="title">GreatMiNDs</h1>
 
                 <div className="login-card">
-                    <h2 className="login-card-title">Login</h2>
+                    <h2 className="login-card-title">Welcome Back! 👋</h2>
 
                     {error && (
-                        <div style={{
-                            color: "red",
-                            marginBottom: "10px",
-                            fontSize: "14px",
-                            textAlign: "center"
-                        }}>
+                        <div className="error-message">
                             {error}
                         </div>
                     )}
 
                     <input
                         type="email"
-                        placeholder="Email"
+                        placeholder="📧 Email address"
                         className="login-input"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -63,14 +58,15 @@ export default function Login() {
 
                     <input
                         type="password"
-                        placeholder="Password"
+                        placeholder="🔒 Password"
                         className="login-input"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleLogin(email, password)}
                     />
 
                     <button className="login-btn" onClick={() => handleLogin(email, password)}>
-                        Login
+                          Login to Dashboard
                     </button>
                 </div>
             </div>
