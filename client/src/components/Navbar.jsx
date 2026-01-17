@@ -14,7 +14,6 @@ export default function Navbar() {
                 <div className="navbar-links">
                     {user ? (
                         <>
-                            <button className="programs-btn">Programs</button>
                             <button className="programs-btn" onClick={() => navigate('/dashboard')}>
                                 Calendar
                             </button>
@@ -33,7 +32,7 @@ export default function Navbar() {
                                     My Registrations
                                 </button>
                             )}
-                            <button className="programs-btn">About</button>
+                            <button className="programs-btn" onClick={() => navigate('/about')}>About</button>
                             <button className="home-btn">Home</button>
                         </>
                     ) : (
