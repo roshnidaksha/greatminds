@@ -25,6 +25,15 @@ const getWeekNumber = (date) => {
  * @returns {Promise<{isValid: boolean, message: string}>}
  */
 export const validateEventSelection = async (newEvent, basket, userId) => {
+    if (basket.some(item => item.id === newEvent.id)) {
+        return { isValid: false, message: "Duplicate Selection: This event is already in your selection." };
+    }
+    
+    const eventStart = new Date(newEvent.start);
+    if (eventStart.getTime() <= Date.now()) {
+        return { isValid: false, message: "Past Event: Cannot select events in the past." };
+    }
+    
     const userDoc = await getDoc(doc(db, "users", userId));
     if (!userDoc.exists()) return { isValid: false, message: "User profile not found." };
     

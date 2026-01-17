@@ -25,8 +25,9 @@ const ParticipantCalendar = () => {
     const [showOnlyWheelchairAccessible, setShowOnlyWheelchairAccessible] = useState(false);
 
     const [basket, setBasket] = useState([]);
+    const [price, setPrice] = useState(0);
     const [isBasketOpen, setIsBasketOpen] = useState(false);
-    const [currentView, setCurrentView] = useState('basket'); // 'basket' or 'summary'
+    const [currentView, setCurrentView] = useState('basket'); // 'basket' or 'summary' or 'calendar'
     const [alert, setAlert] = useState(null); // { message, type: 'success'|'error'|'info' }
 
     // Voice control state
@@ -58,11 +59,6 @@ const ParticipantCalendar = () => {
     };
 
     const handleSelectEvent = async (event) => {
-        if (basket.some(e => e.id === event.id)) {
-            showAlert(setAlert, "This event is already in your selected activities.", 'error');
-            return;
-        }
-
         const result = await validateEventSelection(event, basket, user.uid);
         if (!result.isValid) {
             showAlert(setAlert, result.message, 'error');
@@ -74,6 +70,7 @@ const ParticipantCalendar = () => {
             meetingPreference: null
         };
         setBasket([...basket, eventWithPreference]);
+        setPrice(price + (event.cost || 0));
         setIsDetailModalOpen(false);
         setIsBasketOpen(true);
         setCurrentView('basket');
@@ -81,8 +78,10 @@ const ParticipantCalendar = () => {
     }
 
     const onRemove = (eventId) => {
+        const removedEvent = basket.find(item => item.id === eventId);
         const newBasket = basket.filter(item => item.id !== eventId);
         setBasket(newBasket);
+        setPrice(price - (removedEvent?.cost || 0));
         if (newBasket.length === 0) {
             setIsBasketOpen(false);
             setCurrentView('calendar');
@@ -120,6 +119,7 @@ const ParticipantCalendar = () => {
 
         showAlert(setAlert, "Success! Your registration is complete and staff have been notified.", 'success');
         setBasket([]);
+        setPrice(0);
         setIsBasketOpen(false);
         setCurrentView('calendar');
     };
@@ -242,6 +242,8 @@ const ParticipantCalendar = () => {
                     <p className="warning-text">{validation.msg}</p>
                 )}
 
+                <p>Total Price: ${price.toFixed(2)}</p>
+
                 <button
                     className="checkout-btn"
                     disabled={!validation.valid || basket.length === 0}
@@ -279,6 +281,7 @@ const ParticipantCalendar = () => {
 
                 <div className="total-section">
                     <p>Total Activities: {basket.length}</p>
+                    <p>Total Price: ${price.toFixed(2)}</p>
                     <button className="confirm-pay-btn" onClick={onConfirm}>
                         Confirm and Book
                     </button>

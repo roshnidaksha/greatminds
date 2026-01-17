@@ -21,6 +21,7 @@ const VolunteerCalendar = () => {
     const [selectedEvent, setSelectedEvent] = useState(null);
 
     const [basket, setBasket] = useState([]);
+    const [price, setPrice] = useState(0);
     const [isBasketOpen, setIsBasketOpen] = useState(false);
     const [currentView, setCurrentView] = useState('basket');
     const [alert, setAlert] = useState(null);
@@ -50,11 +51,6 @@ const VolunteerCalendar = () => {
     };
 
     const handleSelectEvent = async (event) => {
-        if (basket.some(e => e.id === event.id)) {
-            showAlert(setAlert, "This event is already in your selected volunteer slots.", 'error');
-            return;
-        }
-
         const result = await validateEventSelection(event, basket, user.uid);
         if (!result.isValid) {
             showAlert(setAlert, result.message, 'error');
@@ -62,6 +58,7 @@ const VolunteerCalendar = () => {
         }
 
         setBasket([...basket, event]);
+        setPrice(price + (event.cost || 0));
         setIsDetailModalOpen(false);
         setIsBasketOpen(true);
         setCurrentView('basket');
@@ -70,6 +67,8 @@ const VolunteerCalendar = () => {
 
     const onRemove = (eventId) => {
         const newBasket = basket.filter(item => item.id !== eventId);
+        const removedEvent = basket.find(item => item.id === eventId);
+        setPrice(price - (removedEvent?.cost || 0));
         setBasket(newBasket);
         if (newBasket.length === 0) {
             setIsBasketOpen(false);
@@ -111,6 +110,7 @@ const VolunteerCalendar = () => {
 
         showAlert(setAlert, "Success! Your volunteer registration is confirmed and staff have been notified.", 'success');
         setBasket([]);
+        setPrice(0);
         setIsBasketOpen(false);
         setCurrentView('calendar');
     };
@@ -153,6 +153,8 @@ const VolunteerCalendar = () => {
                     </div>
                 ))}
 
+                <p>Total Price: ${price.toFixed(2)}</p>
+
                 <button
                     className="checkout-btn"
                     disabled={basket.length === 0}
@@ -189,6 +191,7 @@ const VolunteerCalendar = () => {
 
                 <div className="total-section">
                     <p>Total Volunteer Slots: {basket.length}</p>
+                    <p>Total Price: ${price.toFixed(2)}</p>
                     <button className="confirm-pay-btn" onClick={onConfirm}>
                         Confirm Registration
                     </button>
