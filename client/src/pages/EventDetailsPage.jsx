@@ -7,7 +7,7 @@ import { doc, updateDoc, writeBatch, collection, query, where, getDocs, Timestam
 import UpdateEventForm from "../components/UpdateEventForm";
 import { useEventRegistrations } from "../hooks/useEventRegistrations";
 import { useConfirmation } from "../hooks/useConfirmation";
-import { RosterTable, exportToPDF } from "../components/RosterTable.jsx";
+import { RosterTable } from "../components/RosterTable.jsx";
 import AttendanceTracker from "../components/AttendanceTracker";
 import { showAlert } from '../utils/utils.js';
 import "./EventDetailsPage.css";
@@ -235,13 +235,6 @@ export default function EventDetailsPage() {
                     isSeries={Boolean(isSeriesEvent)}
                 />
 
-                <button
-                    className="back-button"
-                    onClick={() => exportToPDF(event.title, participants, volunteers)}
-                >
-                    📄 Export Attendance PDF
-                </button>
-
                 {/* Participants Section */}
                 <RosterTable
                     title="Participants"
@@ -276,9 +269,10 @@ export default function EventDetailsPage() {
                 </div>
 
                 {/* Attendance Tracking Section - Only shows after confirmations sent */}
-                {confirmationsSent && (confirmedParticipants.length > 0 || confirmedVolunteers.length > 0) && (
+                {(confirmedParticipants.length > 0 || confirmedVolunteers.length > 0) && (
                     <>
                         <AttendanceTracker
+                            eventTitle={event.title}
                             confirmedParticipants={confirmedParticipants}
                             confirmedVolunteers={confirmedVolunteers}
                             handleParticipantAttendanceChange={handleParticipantAttendanceChange}
