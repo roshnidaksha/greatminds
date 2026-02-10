@@ -7,13 +7,6 @@ This project was developed during **Hack4Good 2026**.
 
 How might we reduce friction in activity sign-ups for both individuals and caregivers, while reducing manual effort for staff in managing and consolidating registration data?
 
-Link to application: [GreatMinds](https://greatminds-d4d94.web.app)
-
-To try out our application, you can use the following email ids with the password (123456)
-* `participant@test.com`
-* `volunteer@test.com`
-* `staff@test.com`
-
 ## Getting Started
 
 First, clone this repository:
